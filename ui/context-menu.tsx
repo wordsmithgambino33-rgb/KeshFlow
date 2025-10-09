@@ -9,9 +9,9 @@ import * as React from "react";
 import * as ContextMenuPrimitive from "@radix-ui/react-context-menu@2.2.6";
 import { CheckIcon, ChevronRightIcon, CircleIcon } from "lucide-react@0.487.0";
 
-import { cn } from "./utils";
-import { useBudget } from "../../context/budget_context"; // For dispatch
-import { toast } from "sonner";
+import { cn } from "../utils/utils";
+import { useBudget } from "../context/budget_context"; // For dispatch
+import { toast } from "sonner@2.0.3"; // For notifications
 
 function ContextMenu({
   ...props

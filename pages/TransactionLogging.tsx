@@ -3,10 +3,10 @@ import React, { useState, useEffect } from 'react';
 import { motion } from 'motion/react';
 import { db } from '../firebase/config';
 import { collection, addDoc, deleteDoc, doc, serverTimestamp, query, onSnapshot, orderBy } from 'firebase/firestore';
-import { Card } from './ui/card';
-import { Button } from './ui/button';
-import { Input } from './ui/input';
-import { Textarea } from './ui/textarea';
+import { Card } from '../ui/card';
+import { Button } from '../ui/button';
+import { Input } from '../ui/input';
+import { Textarea } from '../ui/textarea';
 import { 
   ArrowLeft, 
   TrendingUp, 

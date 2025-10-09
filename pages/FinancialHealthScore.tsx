@@ -104,7 +104,7 @@ export function FinancialHealthScore({ onNavigate, user }: FinancialHealthScoreP
         color: 'text-yellow-500',
         bg: 'bg-yellow-500',
         description: 'Your finances need attention in some areas.',
-        chichewa: 'Ndalama zanu zikufuna kuyang\'anidwa m'malo ena.',
+        chichewa: 'Ndalama zanu zikufuna kuyang\'anidwa m\'malo ena.',
       };
     if (score >= 35)
       return {

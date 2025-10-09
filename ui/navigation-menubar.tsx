@@ -9,9 +9,9 @@ import * as NavigationMenuPrimitive from "@radix-ui/react-navigation-menu@1.2.5"
 import { cva } from "class-variance-authority@0.7.1";
 import { ChevronDownIcon } from "lucide-react@0.487.0";
 
-import { cn } from "./utils";
+import { cn } from "../utils/utils";
 import { Link } from "react-router-dom"; // For navigation logic
-import { useBudget } from "../context/budget-context"; // For user state
+import { useBudget } from "../context/budget_context"; // For user state
 
 function NavigationMenu({
   className,

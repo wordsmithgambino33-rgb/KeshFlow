@@ -17,7 +17,7 @@ import {
   Check,
   Edit3
 } from 'lucide-react';
-import { db } from '../firebase';
+import { db } from '../firebase/config';
 import { collection, addDoc, onSnapshot, query, orderBy, Timestamp, doc, updateDoc } from 'firebase/firestore';
 
 interface Goal {

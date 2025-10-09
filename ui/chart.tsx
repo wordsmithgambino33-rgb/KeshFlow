@@ -9,7 +9,7 @@
 import * as React from "react";
 import * as RechartsPrimitive from "recharts@2.15.2";
 
-import { cn } from "./utils";
+import { cn } from "../utils/utils";
 import { useBudget } from "../context/budget_context"; // For data
 
 // Format: { THEME_NAME: CSS_SELECTOR }

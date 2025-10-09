@@ -6,12 +6,12 @@
 "use client";
 
 import * as React from "react";
-import { ChevronLeft, ChevronRight } from "lucide-react@0.487.0";
-import { DayPicker } from "react-day-picker@8.10.1";
+import { ChevronLeft, ChevronRight } from "lucide-react";
+import { DayPicker } from "react-day-picker";
 
-import { cn } from "./utils";
+import { cn } from "../utils/utils";
 import { buttonVariants } from "./button";
-import { useBudget } from "../../context/budget_context"; // For potential dispatch
+import { useBudget } from "../context/budget_context"; // For potential dispatch
 
 function Calendar({
   className,

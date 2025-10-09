@@ -10,9 +10,9 @@ import * as React from "react";
 import * as MenubarPrimitive from "@radix-ui/react-menubar@1.1.6";
 import { CheckIcon, ChevronRightIcon, CircleIcon } from "lucide-react@0.487.0";
 
-import { cn } from "./utils";
+import { cn } from "../utils/utils";
 import { Link } from "react-router-dom"; // For links
-import { useBudget } from "../../context/budget_context"; // For user
+import { useBudget } from "../context/budget_context"; // For user
 
 function Menubar({
   className,
