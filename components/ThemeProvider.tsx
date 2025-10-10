@@ -1,8 +1,11 @@
 
+// components/ThemeProvider.tsx
 import React, { createContext, useState, useEffect, useContext, ReactNode } from "react";
 import { Appearance } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { themes } from "../styles/theme";
+import { getAuth } from "firebase/auth";
+import { getFirestore, doc, onSnapshot, setDoc } from "firebase/firestore";
+import { app } from "../firebase/config"; 
 
 type ThemeMode = "light" | "dark";
 
@@ -17,22 +20,60 @@ const ThemeContext = createContext<ThemeContextProps | undefined>(undefined);
 
 export const ThemeProvider = ({ children }: { children: ReactNode }) => {
   const [mode, setModeState] = useState<ThemeMode>("light");
+  const auth = getAuth(app);
+  const db = getFirestore(app);
 
-  // Persist mode changes
+  // Persist mode locally & in Firebase
   const setMode = async (newMode: ThemeMode) => {
     try {
       setModeState(newMode);
       await AsyncStorage.setItem("app-theme", newMode);
+
+      // Save to Firebase if logged in
+      const user = auth.currentUser;
+      if (user) {
+        const themeRef = doc(db, "users", user.uid);
+        await setDoc(themeRef, { theme: newMode }, { merge: true });
+      }
     } catch (err) {
       console.warn("Failed to save theme:", err);
     }
   };
 
-  // Auto-detect system theme on first load if none saved
+  // Load initial theme and listen for Firebase real-time changes
   useEffect(() => {
+    let unsubscribe: (() => void) | undefined;
+
     const loadTheme = async () => {
       try {
-        const saved = await AsyncStorage.getItem("app-theme");
+        const user = auth.currentUser;
+        let saved: string | null = null;
+
+        if (user) {
+          const themeRef = doc(db, "users", user.uid);
+
+          // Listen to real-time updates
+          unsubscribe = onSnapshot(themeRef, (docSnap) => {
+            if (docSnap.exists()) {
+              const remoteTheme = docSnap.data().theme;
+              if (remoteTheme === "light" || remoteTheme === "dark") {
+                setModeState(remoteTheme);
+              }
+            }
+          });
+
+          // Try to get initial theme from Firebase
+          const docSnap = await themeRef.get();
+          if (docSnap.exists()) {
+            saved = docSnap.data().theme;
+          }
+        }
+
+        // Fallback to AsyncStorage
+        if (!saved) {
+          saved = await AsyncStorage.getItem("app-theme");
+        }
+
         if (saved === "light" || saved === "dark") {
           setModeState(saved);
         } else {
@@ -43,6 +84,7 @@ export const ThemeProvider = ({ children }: { children: ReactNode }) => {
         console.warn("Theme load error:", err);
       }
     };
+
     loadTheme();
 
     // Listen for system theme changes dynamically
@@ -51,10 +93,14 @@ export const ThemeProvider = ({ children }: { children: ReactNode }) => {
       setModeState(colorScheme as ThemeMode);
     });
 
-    return () => sub.remove();
+    // Cleanup
+    return () => {
+      sub.remove();
+      if (unsubscribe) unsubscribe();
+    };
   }, []);
 
-  // Function to toggle between light/dark mode
+  // Toggle theme
   const toggleTheme = () => setMode(mode === "light" ? "dark" : "light");
 
   const theme = mode === "light" ? themes.light : themes.dark;

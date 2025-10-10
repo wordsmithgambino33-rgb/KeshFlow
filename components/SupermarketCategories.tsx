@@ -6,7 +6,7 @@ import { WebDashboard } from "../pages/WebDashboard";
 import { SupermarketCategories } from "./SupermarketCategories";
 import { auth, db } from "../firebase/config";
 import { doc, getDoc, setDoc, updateDoc } from "firebase/firestore";
-import { toast } from "../ui/sonner";
+import { toast } from "sonner";
 
 export function WebDashboard() {
   const [user, setUser] = useState<any>(null);
