@@ -6,12 +6,12 @@
 "use client";
 
 import * as React from "react";
-import * as ContextMenuPrimitive from "@radix-ui/react-context-menu@2.2.6";
-import { CheckIcon, ChevronRightIcon, CircleIcon } from "lucide-react@0.487.0";
+import * as ContextMenuPrimitive from "@radix-ui/react-context-menu";
+import { CheckIcon, ChevronRightIcon, CircleIcon } from "lucide-react";
 
 import { cn } from "../utils/utils";
 import { useBudget } from "../context/budget_context"; // For dispatch
-import { toast } from "sonner@2.0.3"; // For notifications
+import { toast } from "sonner"; // For notifications
 
 function ContextMenu({
   ...props

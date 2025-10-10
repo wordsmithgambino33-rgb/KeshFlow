@@ -1,28 +1,30 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { ThemeProvider } from './components/ThemeProvider';
 import { LandingPage } from './components/LandingPage';
-import { WebDashboard } from './components/WebDashboard';
-import { TransactionLogging } from './components/TransactionLogging';
-import { EnhancedBudgetManagement } from './components/EnhancedBudgetManagement';
-import { ReportsAnalytics } from './components/ReportsAnalytics';
-import { GoalsSaving } from './components/GoalsSaving';
-import { PortfolioPage } from './components/PortfolioPage';
-import { BillsSubscriptions } from './components/BillsSubscriptions';
-import { EducationCenter } from './components/EducationCenter';
-import { Marketplace } from './components/Marketplace';
-import { Community } from './components/Community';
-import { TaxManagement } from './components/TaxManagement';
-import { InsuranceHub } from './components/InsuranceHub';
-import { FinancialHealthScore } from './components/FinancialHealthScore';
-import { ProfileSettings } from './components/ProfileSettings';
-import { SupportCenter } from './components/SupportCenter';
+import { WebDashboard } from './pages/WebDashboard';
+import { TransactionLogging } from './pages/TransactionLogging';
+import { EnhancedBudgetManagement } from './pages/EnhancedBudgetManagement';
+import { ReportsAnalytics } from './pages/ReportsAnalytics';
+import { GoalsSaving } from './pages/GoalsSaving';
+import { PortfolioPage } from './pages/PortfolioPage';
+import { BillsSubscriptions } from './pages/BillsSubscriptions';
+import { EducationCenter } from './pages/EducationCenter'
+import { Marketplace } from './pages/MarketPlace';
+import { Community } from './pages/Community';
+import { TaxManagement } from './pages/TaxManagement';
+import { InsuranceHub } from './pages/InsuranceHub';
+import { FinancialHealthScore } from './pages/FinancialHealthScore';
+import { ProfileSettings } from './pages/ProfileSettings';
+import { SupportCenter } from './pages/SupportCenter';
 import { SignUpAuth } from './components/SignUpAuth';
 import { WebSidebar } from './components/WebSidebar';
 import { MobileSidebar } from './components/MobileSidebar';
-import { ThemeToggle } from './components/ThemeToggle';
+import { ThemeToggle } from './ui/ThemeToggle';
 import { Menu, X } from 'lucide-react';
+import { auth } from './firebase/config';
+import { onAuthStateChanged, User } from 'firebase/auth';
 
 export type Screen =
   | 'landing'
@@ -46,66 +48,78 @@ export type Screen =
 
 function AppContent() {
   const [currentScreen, setCurrentScreen] = useState<Screen>('landing');
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [user, setUser] = useState<User | null>(null);
   const [isMobileSidebarOpen, setMobileSidebarOpen] = useState(false);
+  const [loadingAuth, setLoadingAuth] = useState(true);
 
-  const handleGetStarted = () => {
-    setIsAuthenticated(true);
+  // Listen for Firebase auth state
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
+      setUser(currentUser);
+      setLoadingAuth(false);
+      if (currentUser) setCurrentScreen('dashboard');
+      else setCurrentScreen('landing');
+    });
+    return () => unsubscribe();
+  }, []);
+
+  const handleGetStarted = () => setCurrentScreen('signup');
+
+  const handleSignUpComplete = (user: User) => {
+    setUser(user);
     setCurrentScreen('dashboard');
   };
 
-  const handleSignUp = () => setCurrentScreen('signup');
-  const handleSignUpComplete = () => {
-    setIsAuthenticated(true);
-    setCurrentScreen('dashboard');
-  };
-  const handleLogout = () => {
-    setIsAuthenticated(false);
+  const handleLogout = async () => {
+    await auth.signOut();
+    setUser(null);
     setCurrentScreen('landing');
   };
 
   const renderScreen = () => {
     switch (currentScreen) {
       case 'landing':
-        return <LandingPage onGetStarted={handleGetStarted} onSignUp={handleSignUp} />;
+        return <LandingPage onGetStarted={handleGetStarted} />;
       case 'signup':
         return <SignUpAuth onBack={() => setCurrentScreen('landing')} onSignUpComplete={handleSignUpComplete} />;
       case 'dashboard':
-        return <WebDashboard onNavigate={setCurrentScreen} />;
+        return <WebDashboard onNavigate={setCurrentScreen} user={user} />;
       case 'transactions':
-        return <TransactionLogging onBack={() => setCurrentScreen('dashboard')} />;
+        return <TransactionLogging onBack={() => setCurrentScreen('dashboard')} user={user} />;
       case 'budget':
-        return <EnhancedBudgetManagement onBack={() => setCurrentScreen('dashboard')} />;
+        return <EnhancedBudgetManagement onBack={() => setCurrentScreen('dashboard')} user={user} />;
       case 'reports':
-        return <ReportsAnalytics onBack={() => setCurrentScreen('dashboard')} />;
+        return <ReportsAnalytics onBack={() => setCurrentScreen('dashboard')} user={user} />;
       case 'goals':
-        return <GoalsSaving onBack={() => setCurrentScreen('dashboard')} />;
+        return <GoalsSaving onBack={() => setCurrentScreen('dashboard')} user={user} />;
       case 'portfolio':
-        return <PortfolioPage onNavigate={setCurrentScreen} />;
+        return <PortfolioPage onNavigate={setCurrentScreen} user={user} />;
       case 'bills':
-        return <BillsSubscriptions onNavigate={setCurrentScreen} />;
+        return <BillsSubscriptions onNavigate={setCurrentScreen} user={user} />;
       case 'education':
-        return <EducationCenter onNavigate={setCurrentScreen} />;
+        return <EducationCenter onNavigate={setCurrentScreen} user={user} />;
       case 'marketplace':
-        return <Marketplace onNavigate={setCurrentScreen} />;
+        return <Marketplace onNavigate={setCurrentScreen} user={user} />;
       case 'community':
-        return <Community onNavigate={setCurrentScreen} />;
+        return <Community onNavigate={setCurrentScreen} user={user} />;
       case 'taxes':
-        return <TaxManagement onNavigate={setCurrentScreen} />;
+        return <TaxManagement onNavigate={setCurrentScreen} user={user} />;
       case 'insurance':
-        return <InsuranceHub onNavigate={setCurrentScreen} />;
+        return <InsuranceHub onNavigate={setCurrentScreen} user={user} />;
       case 'financial-health':
-        return <FinancialHealthScore onNavigate={setCurrentScreen} />;
+        return <FinancialHealthScore onNavigate={setCurrentScreen} user={user} />;
       case 'profile':
-        return <ProfileSettings onNavigate={setCurrentScreen} />;
+        return <ProfileSettings onNavigate={setCurrentScreen} user={user} />;
       case 'support':
-        return <SupportCenter onNavigate={setCurrentScreen} />;
+        return <SupportCenter onNavigate={setCurrentScreen} user={user} />;
       default:
-        return <WebDashboard onNavigate={setCurrentScreen} />;
+        return <WebDashboard onNavigate={setCurrentScreen} user={user} />;
     }
   };
 
-  if (!isAuthenticated) {
+  if (loadingAuth) return <p>Loading...</p>;
+
+  if (!user) {
     return <div className="min-h-screen bg-landing-neon">{renderScreen()}</div>;
   }
 
@@ -119,12 +133,12 @@ function AppContent() {
         {isMobileSidebarOpen ? <X size={20} /> : <Menu size={20} />}
       </button>
 
-      {/* Theme Toggle - Top Right */}
+      {/* Theme Toggle */}
       <div className="fixed top-4 right-4 z-50">
         <ThemeToggle />
       </div>
 
-      {/* Web Sidebar - Desktop */}
+      {/* Web Sidebar */}
       <WebSidebar
         currentScreen={currentScreen}
         onNavigate={setCurrentScreen}
