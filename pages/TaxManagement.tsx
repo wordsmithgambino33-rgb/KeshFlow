@@ -9,7 +9,7 @@ import { Button } from '../ui/button';
 import { type Screen } from '../App';
 import { auth, db } from '../firebase/config';
 import { doc, getDoc, setDoc, updateDoc, arrayUnion } from 'firebase/firestore';
-import { toast } from '../ui/sonner';
+import { toast } from 'sonner';
 
 // Example MRA PAYE/Income Tax and Company Tax rates (2025)
 const PAYE_RATES = [

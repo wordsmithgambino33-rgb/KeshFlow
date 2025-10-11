@@ -21,12 +21,12 @@ import {
   Download,
   TrendingUp,
   TrendingDown,
-  ChevronLeft,
+  ChevronLeft, 
   ChevronRight,
   Filter,
   Edit3,
 } from "lucide-react";
-import { db } from "../firebase";
+import { db } from "../firebase/config";
 import {
   collection,
   onSnapshot,

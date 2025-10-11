@@ -8,7 +8,7 @@ import { Button } from "../ui/button";
 import { Input } from "../ui/input";
 import { Progress } from "../ui/progress";
 import { Badge } from "../ui/badge";
-import { FinancialLiteracyLibrary } from "../ui/FinancialLiteracyLibrary";
+import { FinancialLiteracyLibrary } from "../pages/FinancialLiteracyLibrary";
 import { toast } from "react-hot-toast";
 import {
   ArrowLeft,

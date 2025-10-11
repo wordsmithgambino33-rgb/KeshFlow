@@ -33,7 +33,7 @@ import {
   TooltipTrigger,
 } from "./tooltip";
 import { Link } from "react-router-dom"; // Added for navigation logic (part of tech stack)
-import { useBudget } from "../context/budget-context"; // Integrated for user state
+import { useBudget } from "../context/budget_context"; // Integrated for user state
 
 const SIDEBAR_COOKIE_NAME = "sidebar_state";
 const SIDEBAR_COOKIE_MAX_AGE = 60 * 60 * 24 * 7;

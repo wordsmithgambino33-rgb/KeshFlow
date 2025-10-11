@@ -4,11 +4,11 @@
 import React, { useState, useEffect } from "react";
 import { motion } from "motion/react";
 import { User, Settings, Bell, Shield, Palette } from "lucide-react";
-import { Card } from "./ui/card";
-import { Button } from "./ui/button";
+import { Card } from "../ui/card";
+import { Button } from "../ui/button";
 import { type Screen } from "../App";
 import { auth, db } from "../firebase/config";
-import { doc, getDoc, updateDoc, setDoc } from "..firebase/firestore";
+import { doc, getDoc, updateDoc, setDoc } from "firebase/firestore";
 import { onAuthStateChanged, updateProfile, sendPasswordResetEmail } from "firebase/auth";
 import { toast } from "sonner";
 

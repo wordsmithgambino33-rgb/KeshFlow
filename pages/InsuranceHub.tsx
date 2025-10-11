@@ -10,7 +10,7 @@ import { Button } from '../ui/button';
 import { type Screen } from '../App';
 import { auth, db } from '../firebase/config';
 import { doc, getDoc, setDoc, updateDoc, arrayUnion } from 'firebase/firestore';
-import { toast } from 'ui/sonner';
+import { toast } from 'sonner';
 
 interface InsuranceHubProps {
   onNavigate: (screen: Screen) => void;
