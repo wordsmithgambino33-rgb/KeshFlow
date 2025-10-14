@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { motion } from 'motion/react';
 import { 
@@ -19,9 +18,15 @@ import { Input } from '../ui/input';
 import { Label } from '../ui/label';
 import { Card } from '../ui/card';
 import { Badge } from '../ui/badge';
-import { getAuth, createUserWithEmailAndPassword, updateProfile, GoogleAuthProvider, signInWithPopup, RecaptchaVerifier, signInWithPhoneNumber } from 'firebase/auth';
-import { app } from '../firebase/config';
+import { createUserWithEmailAndPassword, updateProfile, GoogleAuthProvider, signInWithPopup, RecaptchaVerifier, signInWithPhoneNumber } from 'firebase/auth';
+import { auth } from '../firebase/config'; // use exported auth instance
 import Toast from 'react-native-toast-message';
+
+declare global {
+  interface Window {
+    recaptchaVerifier?: RecaptchaVerifier | any;
+  }
+}
 
 interface SignUpAuthProps {
   onBack: () => void;
@@ -29,7 +34,6 @@ interface SignUpAuthProps {
 }
 
 export function SignUpAuth({ onBack, onSignUpComplete }: SignUpAuthProps) {
-  const auth = getAuth(app);
   const [authMethod, setAuthMethod] = useState<'phone' | 'email' | null>(null);
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
@@ -154,4 +158,12 @@ export function SignUpAuth({ onBack, onSignUpComplete }: SignUpAuthProps) {
   // (keep your entire existing UI JSX as-is — no modifications to the layout)
   // Just make sure to add this element near your phone form section:
   // <div id="recaptcha-container"></div>
+
+  // Minimal placeholder return so this module compiles.
+  // Replace with your full existing JSX (ensure a <div id="recaptcha-container" /> is present near phone form).
+  return (
+    <div>
+      {/* SignUp UI omitted for brevity. Ensure you include: <div id="recaptcha-container"></div> */}
+    </div>
+  );
 }

@@ -1,11 +1,10 @@
-
 // File: /home/stanleymombera04/KeshFlowWebApp/components/BottomNavigation.tsx
 
 import React from 'react';
 import { motion } from 'motion/react';
 import { Home, PieChart, Target, TrendingUp, CreditCard } from 'lucide-react';
 import { Screen } from '../App';
-import { useBudgetContext } from '../context/budget_context'; // optional: for dynamic counts
+import { BudgetContext } from '../context/budget_context'; // use exported context
 import { Badge } from '../ui/badge';
 
 interface BottomNavigationProps {
@@ -14,7 +13,8 @@ interface BottomNavigationProps {
 }
 
 export function BottomNavigation({ currentScreen, onNavigate }: BottomNavigationProps) {
-  const { transactionCount, goalCount } = useBudgetContext(); // dynamic counts
+  const budget = React.useContext(BudgetContext) as any | null;
+  const { transactionCount = 0, goalCount = 0 } = budget || {};
 
   const navItems = [
     { id: 'dashboard' as Screen, icon: Home, label: 'Home' },

@@ -1,4 +1,3 @@
-
 import React, { useEffect, useState } from 'react';
 import { motion } from 'motion/react';
 import { User, Settings, Bell, Shield, Palette, Camera } from 'lucide-react';
@@ -87,7 +86,8 @@ export function ProfileSettings({ onNavigate }: ProfileSettingsProps) {
     if (!userEmail) return;
     try {
       const docRef = doc(db, "users", userEmail);
-      await updateDoc(docRef, profile);
+      // Cast to any to satisfy Firestore typing while keeping the same object shape
+      await updateDoc(docRef, profile as any);
       toast.success("Profile updated successfully!");
       setEditing(false);
     } catch (error) {
@@ -141,7 +141,10 @@ export function ProfileSettings({ onNavigate }: ProfileSettingsProps) {
                 type="file"
                 accept="image/*"
                 className="hidden"
-                onChange={(e) => e.target.files && handleUploadPhoto(e.target.files[0])}
+                onChange={(e) => {
+                  const file = e.target.files && e.target.files[0];
+                  if (file) handleUploadPhoto(file);
+                }}
               />
             </label>
           </div>
@@ -161,7 +164,7 @@ export function ProfileSettings({ onNavigate }: ProfileSettingsProps) {
           className="grid md:grid-cols-2 gap-6"
         >
           {/* Personal Info */}
-          <Card className="p-6 hover:shadow-lg transition-all cursor-pointer">
+          <Card className="p-6 hover:shadow-lg transition-all">
             <User className="w-8 h-8 text-blue-500 mb-4" />
             <h3 className="font-semibold mb-2">Personal Information</h3>
             <p className="text-sm text-muted-foreground mb-4">
@@ -185,12 +188,113 @@ export function ProfileSettings({ onNavigate }: ProfileSettingsProps) {
                 </div>
               </div>
             ) : (
-              <Button variant="outline" size="sm" onClick={() => setEditing(true)}>
-                Edit Profile
-              </Button>
+              <div>
+                <div className="mb-3">
+                  <div className="text-sm font-medium">{profile.name || 'No name set'}</div>
+                  <div className="text-xs text-muted-foreground">{profile.email}</div>
+                </div>
+                <Button variant="outline" size="sm" onClick={() => setEditing(true)}>
+                  Edit Profile
+                </Button>
+              </div>
             )}
           </Card>
 
           {/* Notifications */}
-          <Card className="p-6 hover:shadow-lg transition-all cursor-pointer">
-            <Bell
+          <Card className="p-6 hover:shadow-lg transition-all">
+            <Bell className="w-8 h-8 text-amber-500 mb-4" />
+            <h3 className="font-semibold mb-2">Notifications</h3>
+            <p className="text-sm text-muted-foreground mb-4">
+              Manage your notification preferences
+            </p>
+            <div className="flex items-center justify-between">
+              <div>
+                <div className="text-sm">Email Notifications</div>
+                <div className="text-xs text-muted-foreground">Receive updates and news</div>
+              </div>
+              <input
+                type="checkbox"
+                checked={!!profile.notifications}
+                onChange={(e) => {
+                  const notifications = e.target.checked;
+                  setProfile({ ...profile, notifications });
+                  // optimistic UI: update backend
+                  if (userEmail) {
+                    const docRef = doc(db, "users", userEmail);
+                    updateDoc(docRef, { notifications }).catch((err) => {
+                      console.error(err);
+                      toast.error("Failed to update notification setting");
+                    });
+                  }
+                }}
+              />
+            </div>
+          </Card>
+
+          {/* Security */}
+          <Card className="p-6 hover:shadow-lg transition-all">
+            <Shield className="w-8 h-8 text-green-500 mb-4" />
+            <h3 className="font-semibold mb-2">Security</h3>
+            <p className="text-sm text-muted-foreground mb-4">
+              Account security and two-factor options
+            </p>
+            <div className="space-y-3">
+              <label className="block text-sm">
+                Security Level
+                <select
+                  value={profile.securityLevel || 'medium'}
+                  onChange={(e) => {
+                    const securityLevel = e.target.value as UserProfile['securityLevel'];
+                    setProfile({ ...profile, securityLevel });
+                    if (userEmail) {
+                      const docRef = doc(db, "users", userEmail);
+                      updateDoc(docRef, { securityLevel }).catch((err) => {
+                        console.error(err);
+                        toast.error("Failed to update security level");
+                      });
+                    }
+                  }}
+                  className="block w-full mt-1"
+                >
+                  <option value="low">Low</option>
+                  <option value="medium">Medium</option>
+                  <option value="high">High</option>
+                </select>
+              </label>
+            </div>
+          </Card>
+
+          {/* Appearance */}
+          <Card className="p-6 hover:shadow-lg transition-all">
+            <Palette className="w-8 h-8 text-pink-500 mb-4" />
+            <h3 className="font-semibold mb-2">Appearance</h3>
+            <p className="text-sm text-muted-foreground mb-4">
+              Theme and display preferences
+            </p>
+            <div className="flex items-center justify-between">
+              <div>
+                <div className="text-sm">Dark Mode</div>
+                <div className="text-xs text-muted-foreground">Toggle dark theme</div>
+              </div>
+              <input
+                type="checkbox"
+                checked={!!profile.darkMode}
+                onChange={(e) => {
+                  const darkMode = e.target.checked;
+                  setProfile({ ...profile, darkMode });
+                  if (userEmail) {
+                    const docRef = doc(db, "users", userEmail);
+                    updateDoc(docRef, { darkMode }).catch((err) => {
+                      console.error(err);
+                      toast.error("Failed to update theme setting");
+                    });
+                  }
+                }}
+              />
+            </div>
+          </Card>
+        </motion.div>
+      </div>
+    </div>
+  );
+}

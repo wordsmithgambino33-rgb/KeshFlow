@@ -1,4 +1,3 @@
-
 // PortfolioPage.tsx
 import React, { useEffect, useMemo, useState } from 'react';
 import { motion } from 'motion/react';
@@ -41,7 +40,7 @@ import {
   updateDoc,
   deleteDoc
 } from 'firebase/firestore';
-import { db } from 'firebase/firestore';
+import { db } from '../firebase/config';
 import { getAuth, onAuthStateChanged } from 'firebase/auth';
 
 interface PortfolioPageProps {
@@ -756,4 +755,5 @@ export function PortfolioPage({ onNavigate }: PortfolioPageProps) {
       )}
     </div>
   );
+}
 }
