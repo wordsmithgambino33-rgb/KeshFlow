@@ -52,6 +52,11 @@ function AppContent() {
   const [isMobileSidebarOpen, setMobileSidebarOpen] = useState(false);
   const [loadingAuth, setLoadingAuth] = useState(true);
 
+  // Set the document title globally
+  useEffect(() => {
+    document.title = 'KeshFlow';
+  }, []);  // Empty array: Runs once on component mount
+
   // Listen for Firebase auth state
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (currentUser) => {

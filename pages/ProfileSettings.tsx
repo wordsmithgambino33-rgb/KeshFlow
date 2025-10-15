@@ -1,141 +1,155 @@
-
-"use client";
-
-import React, { useState, useEffect } from "react";
-import { motion } from "motion/react";
-import { User, Settings, Bell, Shield, Palette } from "lucide-react";
-import { Card } from "../ui/card";
-import { Button } from "../ui/button";
-import { type Screen } from "../App";
-import { auth, db } from "../firebase/config";
-import { doc, getDoc, updateDoc, setDoc } from "firebase/firestore";
-import { onAuthStateChanged, updateProfile, sendPasswordResetEmail } from "firebase/auth";
-import { toast } from "sonner";
+import React, { useEffect, useState } from 'react';
+import { motion } from 'motion/react';
+import { User, Settings, Bell, Shield, Palette, Camera } from 'lucide-react';
+import { Card } from '../ui/card';
+import { Button } from '../ui/button';
+import { Input } from '../ui/input';
+import { type Screen } from '../App';
+import { db, auth, storage } from '../firebase/config'; // Firebase initialized
+import { doc, getDoc, setDoc, updateDoc } from 'firebase/firestore';
+import { onAuthStateChanged } from 'firebase/auth';
+import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
+import { toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 interface ProfileSettingsProps {
   onNavigate: (screen: Screen) => void;
 }
 
+interface UserProfile {
+  name?: string;
+  email?: string;
+  phone?: string;
+  notifications?: boolean;
+  darkMode?: boolean;
+  securityLevel?: 'low' | 'medium' | 'high';
+  photoURL?: string;
+}
+
 export function ProfileSettings({ onNavigate }: ProfileSettingsProps) {
-  const [user, setUser] = useState<any>(null);
-  const [loading, setLoading] = useState(true);
-  const [profileData, setProfileData] = useState({
-    displayName: "",
-    email: "",
-    phone: "",
-    notifications: true,
-    darkMode: false,
-  });
+  const [profile, setProfile] = useState<UserProfile>({});
+  const [editing, setEditing] = useState(false);
+  const [userEmail, setUserEmail] = useState<string | null>(null);
+  const [uploading, setUploading] = useState(false);
 
-  // 🔥 Load user data from Firebase
+  // Watch Firebase Auth state
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, async (currentUser) => {
-      if (currentUser) {
-        setUser(currentUser);
-        const userRef = doc(db, "users", currentUser.uid);
-        const docSnap = await getDoc(userRef);
-
-        if (docSnap.exists()) {
-          setProfileData((prev) => ({
-            ...prev,
-            ...docSnap.data(),
-            email: currentUser.email || "",
-          }));
-        } else {
-          // Create user doc if not exists
-          await setDoc(userRef, {
-            displayName: currentUser.displayName || "",
-            email: currentUser.email,
-            phone: "",
-            notifications: true,
-            darkMode: false,
-          });
-        }
+    const unsubscribe = onAuthStateChanged(auth, (user) => {
+      if (user && user.email) {
+        setUserEmail(user.email);
+      } else {
+        toast.error("No signed-in user found");
       }
-      setLoading(false);
     });
     return () => unsubscribe();
   }, []);
 
-  // 🧠 Update profile info
-  const handleProfileUpdate = async () => {
-    if (!user) return;
+  // Fetch user profile from Firebase
+  useEffect(() => {
+    if (!userEmail) return;
+    const fetchProfile = async () => {
+      try {
+        const docRef = doc(db, "users", userEmail);
+        const docSnap = await getDoc(docRef);
+        if (docSnap.exists()) {
+          setProfile(docSnap.data() as UserProfile);
+        } else {
+          await setDoc(docRef, {
+            name: "",
+            email: userEmail,
+            phone: "",
+            notifications: true,
+            darkMode: false,
+            securityLevel: "medium",
+            photoURL: ""
+          });
+          setProfile({
+            name: "",
+            email: userEmail,
+            phone: "",
+            notifications: true,
+            darkMode: false,
+            securityLevel: "medium",
+            photoURL: ""
+          });
+        }
+      } catch (error) {
+        console.error("Error fetching profile:", error);
+        toast.error("Failed to load profile");
+      }
+    };
+    fetchProfile();
+  }, [userEmail]);
+
+  // Save personal info
+  const handleSaveProfile = async () => {
+    if (!userEmail) return;
     try {
-      const userRef = doc(db, "users", user.uid);
-      await updateDoc(userRef, {
-        displayName: profileData.displayName,
-        phone: profileData.phone,
-      });
-      await updateProfile(user, { displayName: profileData.displayName });
-      toast.success("Profile updated successfully 🎉");
+      const docRef = doc(db, "users", userEmail);
+      // Cast to any to satisfy Firestore typing while keeping the same object shape
+      await updateDoc(docRef, profile as any);
+      toast.success("Profile updated successfully!");
+      setEditing(false);
     } catch (error) {
-      console.error("Error updating profile:", error);
-      toast.error("Failed to update profile 😞");
+      console.error(error);
+      toast.error("Failed to update profile");
     }
   };
 
-  // 🔔 Manage Notifications
-  const handleNotificationToggle = async () => {
-    if (!user) return;
+  // Upload profile picture
+  const handleUploadPhoto = async (file: File) => {
+    if (!userEmail || !file) return;
+    setUploading(true);
     try {
-      const newStatus = !profileData.notifications;
-      setProfileData((prev) => ({ ...prev, notifications: newStatus }));
-      await updateDoc(doc(db, "users", user.uid), { notifications: newStatus });
-      toast.success(
-        newStatus
-          ? "Notifications enabled 🔔"
-          : "Notifications turned off 🔕"
-      );
-    } catch {
-      toast.error("Could not update notification preferences 😞");
+      const storageRef = ref(storage, `profilePictures/${userEmail}`);
+      await uploadBytes(storageRef, file);
+      const photoURL = await getDownloadURL(storageRef);
+      const docRef = doc(db, "users", userEmail);
+      await updateDoc(docRef, { photoURL });
+      setProfile({ ...profile, photoURL });
+      toast.success("Profile picture updated!");
+    } catch (error) {
+      console.error(error);
+      toast.error("Failed to upload profile picture");
+    } finally {
+      setUploading(false);
     }
   };
 
-  // 🎨 Toggle Dark Mode
-  const handleThemeToggle = async () => {
-    if (!user) return;
-    try {
-      const newTheme = !profileData.darkMode;
-      setProfileData((prev) => ({ ...prev, darkMode: newTheme }));
-      await updateDoc(doc(db, "users", user.uid), { darkMode: newTheme });
-      toast.success(
-        newTheme
-          ? "Dark mode enabled 🌙"
-          : "Light mode enabled ☀️"
-      );
-      document.documentElement.classList.toggle("dark", newTheme);
-    } catch {
-      toast.error("Failed to change theme");
-    }
-  };
-
-  // 🛡️ Security: Reset Password
-  const handlePasswordReset = async () => {
-    if (!user?.email) return;
-    try {
-      await sendPasswordResetEmail(auth, user.email);
-      toast.success("Password reset email sent ✅");
-    } catch {
-      toast.error("Failed to send password reset email ❌");
-    }
-  };
-
-  if (loading)
+  if (!userEmail) {
     return (
-      <div className="flex justify-center items-center h-screen">
-        <p className="text-muted-foreground animate-pulse">Loading profile...</p>
+      <div className="min-h-screen flex items-center justify-center">
+        <p className="text-muted-foreground">Loading profile...</p>
       </div>
     );
+  }
 
   return (
     <div className="min-h-screen p-4 lg:p-8">
       <div className="max-w-4xl mx-auto space-y-8">
-        {/* Header */}
-        <div className="text-center">
-          <h1 className="text-3xl font-poppins font-bold flex items-center justify-center gap-3 mb-4">
-            <div className="w-10 h-10 bg-gradient-to-br from-orange-500 to-red-500 rounded-xl flex items-center justify-center">
-              <User className="w-5 h-5 text-white" />
-            </div>
+        {/* Header with avatar */}
+        <div className="text-center space-y-4">
+          <div className="relative w-24 h-24 mx-auto">
+            <img
+              src={profile.photoURL || '/default-avatar.png'}
+              alt="Profile"
+              className="w-24 h-24 rounded-full object-cover border-2 border-primary"
+            />
+            <label className="absolute bottom-0 right-0 bg-primary p-2 rounded-full cursor-pointer">
+              <Camera className="w-5 h-5 text-white" />
+              <input
+                type="file"
+                accept="image/*"
+                className="hidden"
+                onChange={(e) => {
+                  const file = e.target.files && e.target.files[0];
+                  if (file) handleUploadPhoto(file);
+                }}
+              />
+            </label>
+          </div>
+
+          <h1 className="text-3xl font-poppins font-bold flex items-center justify-center gap-3 mb-1">
             Profile & Settings
           </h1>
           <p className="text-muted-foreground">
@@ -149,98 +163,137 @@ export function ProfileSettings({ onNavigate }: ProfileSettingsProps) {
           animate={{ opacity: 1, y: 0 }}
           className="grid md:grid-cols-2 gap-6"
         >
-          {/* 👤 Personal Information */}
-          <Card className="p-6 hover:shadow-lg transition-all cursor-pointer">
+          {/* Personal Info */}
+          <Card className="p-6 hover:shadow-lg transition-all">
             <User className="w-8 h-8 text-blue-500 mb-4" />
             <h3 className="font-semibold mb-2">Personal Information</h3>
             <p className="text-sm text-muted-foreground mb-4">
               Update your profile details and contact information
             </p>
-            <div className="space-y-3 mb-4">
-              <input
-                type="text"
-                value={profileData.displayName}
-                onChange={(e) =>
-                  setProfileData({ ...profileData, displayName: e.target.value })
-                }
-                className="w-full p-2 border rounded-lg text-sm"
-                placeholder="Full Name"
-              />
-              <input
-                type="text"
-                value={profileData.phone}
-                onChange={(e) =>
-                  setProfileData({ ...profileData, phone: e.target.value })
-                }
-                className="w-full p-2 border rounded-lg text-sm"
-                placeholder="Phone Number"
-              />
-              <input
-                type="email"
-                value={profileData.email}
-                disabled
-                className="w-full p-2 border rounded-lg bg-muted text-sm"
-              />
-            </div>
-            <Button variant="default" size="sm" onClick={handleProfileUpdate}>
-              Save Changes
-            </Button>
+            {editing ? (
+              <div className="space-y-2 mb-4">
+                <Input
+                  placeholder="Full Name"
+                  value={profile.name || ""}
+                  onChange={(e) => setProfile({ ...profile, name: e.target.value })}
+                />
+                <Input
+                  placeholder="Phone Number"
+                  value={profile.phone || ""}
+                  onChange={(e) => setProfile({ ...profile, phone: e.target.value })}
+                />
+                <div className="flex gap-2">
+                  <Button size="sm" onClick={handleSaveProfile}>Save</Button>
+                  <Button variant="outline" size="sm" onClick={() => setEditing(false)}>Cancel</Button>
+                </div>
+              </div>
+            ) : (
+              <div>
+                <div className="mb-3">
+                  <div className="text-sm font-medium">{profile.name || 'No name set'}</div>
+                  <div className="text-xs text-muted-foreground">{profile.email}</div>
+                </div>
+                <Button variant="outline" size="sm" onClick={() => setEditing(true)}>
+                  Edit Profile
+                </Button>
+              </div>
+            )}
           </Card>
 
-          {/* 🔔 Notifications */}
-          <Card className="p-6 hover:shadow-lg transition-all cursor-pointer">
-            <Bell className="w-8 h-8 text-green-500 mb-4" />
+          {/* Notifications */}
+          <Card className="p-6 hover:shadow-lg transition-all">
+            <Bell className="w-8 h-8 text-amber-500 mb-4" />
             <h3 className="font-semibold mb-2">Notifications</h3>
             <p className="text-sm text-muted-foreground mb-4">
-              Customize your notification preferences
+              Manage your notification preferences
             </p>
-            <Button
-              variant={profileData.notifications ? "default" : "outline"}
-              size="sm"
-              onClick={handleNotificationToggle}
-            >
-              {profileData.notifications ? "Disable Notifications" : "Enable Notifications"}
-            </Button>
+            <div className="flex items-center justify-between">
+              <div>
+                <div className="text-sm">Email Notifications</div>
+                <div className="text-xs text-muted-foreground">Receive updates and news</div>
+              </div>
+              <input
+                type="checkbox"
+                checked={!!profile.notifications}
+                onChange={(e) => {
+                  const notifications = e.target.checked;
+                  setProfile({ ...profile, notifications });
+                  // optimistic UI: update backend
+                  if (userEmail) {
+                    const docRef = doc(db, "users", userEmail);
+                    updateDoc(docRef, { notifications }).catch((err) => {
+                      console.error(err);
+                      toast.error("Failed to update notification setting");
+                    });
+                  }
+                }}
+              />
+            </div>
           </Card>
 
-          {/* 🛡️ Security */}
-          <Card className="p-6 hover:shadow-lg transition-all cursor-pointer">
-            <Shield className="w-8 h-8 text-red-500 mb-4" />
-            <h3 className="font-semibold mb-2">Security & Privacy</h3>
+          {/* Security */}
+          <Card className="p-6 hover:shadow-lg transition-all">
+            <Shield className="w-8 h-8 text-green-500 mb-4" />
+            <h3 className="font-semibold mb-2">Security</h3>
             <p className="text-sm text-muted-foreground mb-4">
-              Manage your security settings and privacy controls
+              Account security and two-factor options
             </p>
-            <Button variant="outline" size="sm" onClick={handlePasswordReset}>
-              Reset Password
-            </Button>
+            <div className="space-y-3">
+              <label className="block text-sm">
+                Security Level
+                <select
+                  value={profile.securityLevel || 'medium'}
+                  onChange={(e) => {
+                    const securityLevel = e.target.value as UserProfile['securityLevel'];
+                    setProfile({ ...profile, securityLevel });
+                    if (userEmail) {
+                      const docRef = doc(db, "users", userEmail);
+                      updateDoc(docRef, { securityLevel }).catch((err) => {
+                        console.error(err);
+                        toast.error("Failed to update security level");
+                      });
+                    }
+                  }}
+                  className="block w-full mt-1"
+                >
+                  <option value="low">Low</option>
+                  <option value="medium">Medium</option>
+                  <option value="high">High</option>
+                </select>
+              </label>
+            </div>
           </Card>
 
-          {/* 🎨 Appearance */}
-          <Card className="p-6 hover:shadow-lg transition-all cursor-pointer">
-            <Palette className="w-8 h-8 text-purple-500 mb-4" />
+          {/* Appearance */}
+          <Card className="p-6 hover:shadow-lg transition-all">
+            <Palette className="w-8 h-8 text-pink-500 mb-4" />
             <h3 className="font-semibold mb-2">Appearance</h3>
             <p className="text-sm text-muted-foreground mb-4">
-              Customize the look and feel of your app
+              Theme and display preferences
             </p>
-            <Button
-              variant={profileData.darkMode ? "default" : "outline"}
-              size="sm"
-              onClick={handleThemeToggle}
-            >
-              {profileData.darkMode ? "Switch to Light Mode" : "Switch to Dark Mode"}
-            </Button>
+            <div className="flex items-center justify-between">
+              <div>
+                <div className="text-sm">Dark Mode</div>
+                <div className="text-xs text-muted-foreground">Toggle dark theme</div>
+              </div>
+              <input
+                type="checkbox"
+                checked={!!profile.darkMode}
+                onChange={(e) => {
+                  const darkMode = e.target.checked;
+                  setProfile({ ...profile, darkMode });
+                  if (userEmail) {
+                    const docRef = doc(db, "users", userEmail);
+                    updateDoc(docRef, { darkMode }).catch((err) => {
+                      console.error(err);
+                      toast.error("Failed to update theme setting");
+                    });
+                  }
+                }}
+              />
+            </div>
           </Card>
         </motion.div>
-
-        {/* Coming Soon Notice */}
-        <Card className="p-8 text-center bg-muted/30">
-          <Settings className="w-16 h-16 text-muted-foreground mx-auto mb-4" />
-          <h3 className="font-semibold mb-2">Settings Panel Coming Soon</h3>
-          <p className="text-muted-foreground max-w-md mx-auto">
-            We're working on a comprehensive settings panel where you can customize 
-            every aspect of your <strong>KeshFlow</strong> experience.
-          </p>
-        </Card>
       </div>
     </div>
   );
