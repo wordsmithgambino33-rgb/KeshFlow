@@ -63,7 +63,6 @@ export function LandingPage({ onGetStarted, onSignUp }: LandingPageProps) {
         setUserData(null);
       }
     });
-
     return () => unsubscribe();
   }, []);
 
@@ -75,22 +74,20 @@ export function LandingPage({ onGetStarted, onSignUp }: LandingPageProps) {
         const totalUsers = usersSnap.size;
 
         let totalMoney = 0;
+        let totalRating = 0;
+        let ratedUsers = 0;
+
         usersSnap.forEach((doc) => {
           const data = doc.data();
           if (data.financialData?.balance) {
             totalMoney += Number(data.financialData.balance?.replace(/\D/g, '')) || 0;
           }
-        });
-
-        let totalRating = 0;
-        let ratedUsers = 0;
-        usersSnap.forEach((doc) => {
-          const data = doc.data();
           if (data.financialData?.rating) {
             totalRating += data.financialData.rating;
             ratedUsers += 1;
           }
         });
+
         const userSatisfaction = ratedUsers > 0 ? Math.round((totalRating / ratedUsers) * 20) : 95;
 
         setStatsData({
@@ -105,106 +102,58 @@ export function LandingPage({ onGetStarted, onSignUp }: LandingPageProps) {
     };
 
     fetchStats();
-
     const usersQuery = collection(db, 'users');
     const unsubscribeStats = onSnapshot(usersQuery, () => fetchStats());
-
     return () => unsubscribeStats();
   }, []);
 
   const features = [
-    {
-      icon: <Wallet className="w-6 h-6" />,
-      title: 'Smart Budgeting',
-      description: 'AI-powered budget recommendations tailored for Malawian lifestyle and expenses'
-    },
-    {
-      icon: <Target className="w-6 h-6" />,
-      title: 'Goal Tracking',
-      description: 'Set and achieve financial goals with visual progress tracking and smart insights'
-    },
-    {
-      icon: <TrendingUp className="w-6 h-6" />,
-      title: 'Expense Analytics',
-      description: 'Detailed reports and analytics to understand your spending patterns'
-    },
-    {
-      icon: <Shield className="w-6 h-6" />,
-      title: 'Secure & Private',
-      description: 'Bank-level security with local data storage and privacy protection'
-    }
+    { icon: <Wallet className="w-6 h-6" />, title: 'Smart Budgeting', description: 'AI-powered budget recommendations tailored for Malawian lifestyle and expenses' },
+    { icon: <Target className="w-6 h-6" />, title: 'Goal Tracking', description: 'Set and achieve financial goals with visual progress tracking and smart insights' },
+    { icon: <TrendingUp className="w-6 h-6" />, title: 'Expense Analytics', description: 'Detailed reports and analytics to understand your spending patterns' },
+    { icon: <Shield className="w-6 h-6" />, title: 'Secure & Private', description: 'Bank-level security with local data storage and privacy protection' }
   ];
 
   const testimonials = [
-    {
-      name: 'Grace Mbewe',
-      role: 'Teacher, Lilongwe',
-      content:
-        'KeshFlow helped me save for my children’s school fees. The Chichewa support makes it so easy to use!',
-      rating: 5
-    },
-    {
-      name: 'Lusekero Mwafulirwa',
-      role: 'Business Owner, Mzuzu',
-      content:
-        'Perfect for tracking my small business expenses and planning for growth. The ganyu tracking feature is brilliant!',
-      rating: 5
-    },
-    {
-      name: 'Ben Kandapo',
-      role: 'Student, Blantyre',
-      content:
-        'Simple, beautiful, and designed for us Malawians. Finally, a budgeting app that understands our culture!',
-      rating: 5
-    }
+    { name: 'Grace Mbewe', role: 'Teacher, Lilongwe', content: 'KeshFlow helped me save for my children’s school fees. The Chichewa support makes it so easy to use!', rating: 5 },
+    { name: 'Lusekero Mwafulirwa', role: 'Business Owner, Mzuzu', content: 'Perfect for tracking my small business expenses and planning for growth. The ganyu tracking feature is brilliant!', rating: 5 },
+    { name: 'Ben Kandapo', role: 'Student, Blantyre', content: 'Simple, beautiful, and designed for us Malawians. Finally, a budgeting app that understands our culture!', rating: 5 }
   ];
 
   const currentYear = new Date().getFullYear();
 
   return (
-    <div className="min-h-screen relative overflow-hidden">
+    <div className="min-h-screen relative overflow-hidden bg-background">
       <Toaster position="top-right" />
       <div className="absolute top-6 right-6 z-10">
         <ThemeToggle />
       </div>
 
-      {/* Hero Section omitted, same as your original */}
+      {/* Hero Section */}
+      {/* Insert full hero section as in original */}
 
       {/* Stats Section */}
       <section className="py-20 px-6 lg:px-12">
         <div className="max-w-7xl mx-auto">
-          <motion.div
-            initial={{ opacity: 0, y: 50 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8 }}
-            viewport={{ once: true }}
-            className="grid grid-cols-2 lg:grid-cols-4 gap-8"
-          >
-            {['totalUsers', 'totalMoneyManaged', 'userSatisfaction', 'supportAvailability'].map((key, i) => {
-              const value = statsData[key as keyof typeof statsData];
-              const label = ['Active Users', 'Money Managed', 'User Satisfaction', 'Support'][i];
-              return (
-                <motion.div
-                  key={key}
-                  initial={{ opacity: 0, y: 20 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.6 }}
-                  className="text-center"
-                >
-                  <h3 className="text-3xl lg:text-4xl font-bold text-primary mb-2">
-                    {key === 'totalMoneyManaged' ? `MWK ${Number(value).toLocaleString()}` : value}
-                  </h3>
-                  <p className="text-muted-foreground">{label}</p>
-                </motion.div>
-              );
-            })}
+          <motion.div initial={{ opacity: 0, y: 50 }} whileInView={{ opacity: 1, y: 0 }} transition={{ duration: 0.8 }} viewport={{ once: true }} className="grid grid-cols-2 lg:grid-cols-4 gap-8">
+            {[
+              { label: 'Active Users', value: statsData.totalUsers + '+' },
+              { label: 'Money Managed', value: `MWK ${statsData.totalMoneyManaged.toLocaleString()}` },
+              { label: 'User Satisfaction', value: statsData.userSatisfaction + '%' },
+              { label: 'Support', value: statsData.supportAvailability },
+            ].map((stat, i) => (
+              <motion.div key={i} initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} transition={{ duration: 0.6 }} className="text-center">
+                <h3 className="text-3xl lg:text-4xl font-bold text-primary mb-2">{stat.value}</h3>
+                <p className="text-muted-foreground">{stat.label}</p>
+              </motion.div>
+            ))}
           </motion.div>
         </div>
       </section>
 
-      {/* Features and Testimonials sections remain the same */}
+      {/* Features, Testimonials, Footer */}
+      {/* Keep everything as original including icons, cards, and styling */}
 
-      {/* Footer */}
       <footer className="border-t border-border py-12 px-6 lg:px-12">
         <div className="max-w-7xl mx-auto">
           <div className="grid md:grid-cols-4 gap-8">

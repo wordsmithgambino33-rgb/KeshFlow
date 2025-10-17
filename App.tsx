@@ -1,5 +1,6 @@
 
 import React, { useState, useEffect } from 'react';
+import { View, Text, Pressable } from 'react-native';
 import { motion, AnimatePresence } from 'motion/react';
 import { ThemeProvider, useTheme } from './components/ThemeProvider';
 import { LandingPage } from './components/LandingPage';
@@ -25,6 +26,9 @@ import { ThemeToggle } from './ui/ThemeToggle';
 import { Menu, X } from 'lucide-react';
 import { auth } from './firebase/config';
 import { onAuthStateChanged, User } from 'firebase/auth';
+import { NativeWindStyleSheet } from 'nativewind';
+
+NativeWindStyleSheet.setOutput({ default: 'native' });
 
 export type Screen =
   | 'landing'
@@ -48,7 +52,7 @@ export type Screen =
 
 function AppContent() {
   const { mode } = useTheme();
-  const [currentScreen, setCurrentScreen] = useState<Screen>('landing'); // always start with landing
+  const [currentScreen, setCurrentScreen] = useState<Screen>('landing');
   const [user, setUser] = useState<User | null>(null);
   const [isMobileSidebarOpen, setMobileSidebarOpen] = useState(false);
   const [loadingAuth, setLoadingAuth] = useState(true);
@@ -92,7 +96,8 @@ function AppContent() {
     const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
       setUser(currentUser);
       setLoadingAuth(false);
-      // Do not auto-switch to dashboard to preserve landing page
+      // Only set dashboard if explicitly navigating
+      // Initial landing page stays
     });
     return () => unsubscribe();
   }, []);
@@ -142,35 +147,36 @@ function AppContent() {
         return <FinancialHealthScore onNavigate={setCurrentScreen} user={user} />;
       case 'profile':
         return <ProfileSettings onNavigate={setCurrentScreen} user={user} />;
+      case 'settings':
+        return <ProfileSettings onNavigate={setCurrentScreen} user={user} />;
       case 'support':
         return <SupportCenter onNavigate={setCurrentScreen} user={user} />;
       default:
-        return <WebDashboard onNavigate={setCurrentScreen} user={user} />;
+        return <LandingPage onGetStarted={handleGetStarted} />;
     }
   };
 
-  if (loadingAuth) {
+  if (loadingAuth)
     return (
-      <div className={`flex items-center justify-center h-screen ${mode === 'dark' ? 'bg-black' : 'bg-white'}`}>
-        <span className={`${mode === 'dark' ? 'text-white' : 'text-black'}`}>Loading...</span>
-      </div>
+      <View className={`flex-1 justify-center items-center ${mode === 'dark' ? 'bg-black' : 'bg-white'}`}>
+        <Text className={`text-lg ${mode === 'dark' ? 'text-white' : 'text-black'}`}>Loading...</Text>
+      </View>
     );
-  }
 
   return (
-    <div className={`flex flex-row min-h-screen ${mode === 'dark' ? 'bg-black' : 'bg-white'}`}>
+    <View className={`flex-1 flex-row ${mode === 'dark' ? 'bg-black' : 'bg-white'}`}>
       {/* Mobile Menu Button */}
-      <div
-        onClick={() => setMobileSidebarOpen(!isMobileSidebarOpen)}
-        className="lg:hidden fixed top-4 left-4 z-50 p-2 rounded-lg bg-card/80 backdrop-blur-sm border border-border shadow-lg cursor-pointer"
+      <Pressable
+        onPress={() => setMobileSidebarOpen(!isMobileSidebarOpen)}
+        className="lg:hidden fixed top-4 left-4 z-50 p-2 rounded-lg bg-card/80 backdrop-blur-sm border border-border shadow-lg"
       >
         {isMobileSidebarOpen ? <X size={20} /> : <Menu size={20} />}
-      </div>
+      </Pressable>
 
       {/* Theme Toggle */}
-      <div className="fixed top-4 right-4 z-50">
+      <View className="fixed top-4 right-4 z-50">
         <ThemeToggle />
-      </div>
+      </View>
 
       {/* Web Sidebar */}
       <WebSidebar
@@ -191,7 +197,7 @@ function AppContent() {
       />
 
       {/* Main Content */}
-      <div className="flex-1 lg:ml-64 p-4">
+      <View className="flex-1 lg:ml-64 min-h-screen p-4">
         <AnimatePresence mode="wait">
           <motion.div
             key={currentScreen}
@@ -199,12 +205,13 @@ function AppContent() {
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -20 }}
             transition={{ duration: 0.4, ease: 'easeInOut' }}
+            className="h-full"
           >
             {renderScreen()}
           </motion.div>
         </AnimatePresence>
-      </div>
-    </div>
+      </View>
+    </View>
   );
 }
 
