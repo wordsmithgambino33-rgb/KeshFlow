@@ -1,4 +1,3 @@
-// File: /home/stanleymombera04/KeshFlowWebApp/components/BottomNavigation.tsx
 
 import React from 'react';
 import { motion } from 'motion/react';

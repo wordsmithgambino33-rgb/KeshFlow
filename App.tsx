@@ -1,10 +1,11 @@
 
+  // App.tsx
 import React, { useEffect, useState } from "react";
 import { NavigationContainer } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { ThemeProvider, useTheme } from "./components/ThemeProvider";
-import LandingPage from "./pages/LandingPage";
-import HomePage from "./pages/HomePage";
+import { LandingPage } from "./components/LandingPage";
+import { WebDashboard } from "./pages/WebDashboard";
 import { StatusBar } from "expo-status-bar";
 import { View, ActivityIndicator } from "react-native";
 
@@ -47,7 +48,7 @@ function AppContent() {
         screenOptions={{ headerShown: false }}
       >
         <Stack.Screen name="Landing" component={LandingPage} />
-        <Stack.Screen name="Home" component={HomePage} />
+        <Stack.Screen name="Dashboard" component={WebDashboard} />
       </Stack.Navigator>
     </NavigationContainer>
   );
