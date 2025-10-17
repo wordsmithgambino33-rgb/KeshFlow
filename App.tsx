@@ -1,7 +1,5 @@
-
 import React, { useState, useEffect } from 'react';
-import { View, Text, Pressable } from 'react-native';
-import { motion, AnimatePresence } from 'motion/react';
+import { motion, AnimatePresence } from 'framer-motion';
 import { ThemeProvider, useTheme } from './components/ThemeProvider';
 import { LandingPage } from './components/LandingPage';
 import { WebDashboard } from './pages/WebDashboard';
@@ -25,10 +23,7 @@ import { MobileSidebar } from './components/MobileSidebar';
 import { ThemeToggle } from './ui/ThemeToggle';
 import { Menu, X } from 'lucide-react';
 import { auth } from './firebase/config';
-import { onAuthStateChanged, User } from 'firebase/auth';
-import { NativeWindStyleSheet } from 'nativewind';
-
-NativeWindStyleSheet.setOutput({ default: 'native' });
+import { onAuthStateChanged, User, signOut } from 'firebase/auth';
 
 export type Screen =
   | 'landing'
@@ -52,7 +47,7 @@ export type Screen =
 
 function AppContent() {
   const { mode } = useTheme();
-  const [currentScreen, setCurrentScreen] = useState<Screen>('landing');
+  const [currentScreen, setCurrentScreen] = useState<Screen>('landing'); // default landing
   const [user, setUser] = useState<User | null>(null);
   const [isMobileSidebarOpen, setMobileSidebarOpen] = useState(false);
   const [loadingAuth, setLoadingAuth] = useState(true);
@@ -96,8 +91,7 @@ function AppContent() {
     const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
       setUser(currentUser);
       setLoadingAuth(false);
-      // Only set dashboard if explicitly navigating
-      // Initial landing page stays
+      // Do NOT auto-navigate to dashboard; landing remains default
     });
     return () => unsubscribe();
   }, []);
@@ -108,7 +102,7 @@ function AppContent() {
     setCurrentScreen('dashboard');
   };
   const handleLogout = async () => {
-    await auth.signOut();
+    await signOut(auth);
     setUser(null);
     setCurrentScreen('landing');
   };
@@ -147,8 +141,6 @@ function AppContent() {
         return <FinancialHealthScore onNavigate={setCurrentScreen} user={user} />;
       case 'profile':
         return <ProfileSettings onNavigate={setCurrentScreen} user={user} />;
-      case 'settings':
-        return <ProfileSettings onNavigate={setCurrentScreen} user={user} />;
       case 'support':
         return <SupportCenter onNavigate={setCurrentScreen} user={user} />;
       default:
@@ -158,25 +150,25 @@ function AppContent() {
 
   if (loadingAuth)
     return (
-      <View className={`flex-1 justify-center items-center ${mode === 'dark' ? 'bg-black' : 'bg-white'}`}>
-        <Text className={`text-lg ${mode === 'dark' ? 'text-white' : 'text-black'}`}>Loading...</Text>
-      </View>
+      <div className={`flex items-center justify-center h-screen ${mode === 'dark' ? 'bg-black' : 'bg-white'}`}>
+        <p className={`text-xl font-semibold ${mode === 'dark' ? 'text-white' : 'text-black'}`}>Loading...</p>
+      </div>
     );
 
   return (
-    <View className={`flex-1 flex-row ${mode === 'dark' ? 'bg-black' : 'bg-white'}`}>
+    <div className={`flex flex-row min-h-screen ${mode === 'dark' ? 'bg-black' : 'bg-white'}`}>
       {/* Mobile Menu Button */}
-      <Pressable
-        onPress={() => setMobileSidebarOpen(!isMobileSidebarOpen)}
+      <button
+        onClick={() => setMobileSidebarOpen(!isMobileSidebarOpen)}
         className="lg:hidden fixed top-4 left-4 z-50 p-2 rounded-lg bg-card/80 backdrop-blur-sm border border-border shadow-lg"
       >
         {isMobileSidebarOpen ? <X size={20} /> : <Menu size={20} />}
-      </Pressable>
+      </button>
 
       {/* Theme Toggle */}
-      <View className="fixed top-4 right-4 z-50">
+      <div className="fixed top-4 right-4 z-50">
         <ThemeToggle />
-      </View>
+      </div>
 
       {/* Web Sidebar */}
       <WebSidebar
@@ -197,7 +189,7 @@ function AppContent() {
       />
 
       {/* Main Content */}
-      <View className="flex-1 lg:ml-64 min-h-screen p-4">
+      <main className="flex-1 lg:ml-64 min-h-screen p-4">
         <AnimatePresence mode="wait">
           <motion.div
             key={currentScreen}
@@ -210,8 +202,8 @@ function AppContent() {
             {renderScreen()}
           </motion.div>
         </AnimatePresence>
-      </View>
-    </View>
+      </main>
+    </div>
   );
 }
 
