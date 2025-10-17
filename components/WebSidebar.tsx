@@ -1,14 +1,14 @@
-
 import React, { useEffect, useState } from 'react';
-import { motion } from 'motion/react';
+import { motion } from 'framer-motion';
 import { 
   LayoutDashboard, CreditCard, PieChart, Target, BarChart3, Wallet, LogOut, User, Bell, HelpCircle, TrendingUp, Receipt, GraduationCap, ShoppingBag, Users, FileText, Shield, Activity, ChevronDown, ChevronRight
 } from 'lucide-react';
 import { Button } from '../ui/button';
 import { Avatar } from '../ui/avatar';
 import { Badge } from '../ui/badge';
-import { db } from '../firebase/config';
-import { collection, getDocs, query, where } from 'firebase/firestore';
+import { db, auth } from '../firebase/config';
+import { collection, getDocs, query, where, doc, getDoc } from 'firebase/firestore';
+import { onAuthStateChanged } from 'firebase/auth';
 import { type Screen } from '../App';
 
 interface WebSidebarProps {
@@ -35,6 +35,40 @@ export function WebSidebar({ currentScreen, onNavigate, isOpen, onClose, onLogou
   const [expandedSections, setExpandedSections] = useState<string[]>(['Main', 'Wealth Building', 'Management', 'Learn & Grow']);
   const [pendingBillsCount, setPendingBillsCount] = useState<number>(0);
   const [unreadNotifications, setUnreadNotifications] = useState<number>(0);
+  const [userName, setUserName] = useState<string>('Guest');
+  const [membership, setMembership] = useState<string>('Basic Member');
+
+  // listen for auth changes and fetch user profile by UID
+  useEffect(() => {
+    const unsubscribeAuth = onAuthStateChanged(auth, async (user) => {
+      if (!user) {
+        setUserName('Guest');
+        setMembership('Basic Member');
+        return;
+      }
+      try {
+        const userDocRef = doc(db, 'users', user.uid);
+        const userSnap = await getDoc(userDocRef);
+        const data = userSnap.exists() ? userSnap.data() : null;
+        setUserName(data?.displayName || data?.name || user.displayName || 'User');
+
+        // Determine membership level from Firestore fields (supports multiple possible field names)
+        const rawPlan =
+          (data && (data.subscription?.plan || data.plan || data.subscriptionLevel || data.membership)) ||
+          'basic';
+        const plan = String(rawPlan).toLowerCase();
+        if (plan === 'premium') setMembership('Premium Member');
+        else if (plan === 'standard' || plan === 'standard_member' || plan === 'standard member') setMembership('Standard Member');
+        else setMembership('Basic Member'); // default for free/no-plan
+
+      } catch (err) {
+        console.error('Error fetching user profile:', err);
+        setUserName(user.displayName || 'User');
+        setMembership('Basic Member');
+      }
+    });
+    return () => unsubscribeAuth();
+  }, []);
 
   // --- Firebase badge logic ---
   const fetchPendingBills = async () => {
@@ -125,7 +159,7 @@ export function WebSidebar({ currentScreen, onNavigate, isOpen, onClose, onLogou
               <Wallet className="w-5 h-5 text-white" />
             </div>
             <div>
-              <h2 className="font-poppins font-bold text-lg">NdalaFlow</h2>
+              <h2 className="font-poppins font-bold text-lg">KeshFlow</h2>
               <p className="text-xs text-muted-foreground">Financial Freedom</p>
             </div>
           </div>
@@ -140,8 +174,8 @@ export function WebSidebar({ currentScreen, onNavigate, isOpen, onClose, onLogou
               </div>
             </Avatar>
             <div className="flex-1">
-              <h3 className="font-medium">John Mwale</h3>
-              <p className="text-sm text-muted-foreground">Premium Member</p>
+              <h3 className="font-medium">{userName}</h3>
+              <p className="text-sm text-muted-foreground">{membership}</p>
             </div>
             <Bell className="w-4 h-4 text-muted-foreground" />
           </div>

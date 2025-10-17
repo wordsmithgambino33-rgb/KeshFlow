@@ -1,5 +1,6 @@
+
 import React, { useState, useEffect } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion, AnimatePresence } from 'motion/react';
 import { ThemeProvider, useTheme } from './components/ThemeProvider';
 import { LandingPage } from './components/LandingPage';
 import { WebDashboard } from './pages/WebDashboard';
@@ -23,7 +24,7 @@ import { MobileSidebar } from './components/MobileSidebar';
 import { ThemeToggle } from './ui/ThemeToggle';
 import { Menu, X } from 'lucide-react';
 import { auth } from './firebase/config';
-import { onAuthStateChanged, User, signOut } from 'firebase/auth';
+import { onAuthStateChanged, User } from 'firebase/auth';
 
 export type Screen =
   | 'landing'
@@ -47,7 +48,7 @@ export type Screen =
 
 function AppContent() {
   const { mode } = useTheme();
-  const [currentScreen, setCurrentScreen] = useState<Screen>('landing'); // default landing
+  const [currentScreen, setCurrentScreen] = useState<Screen>('landing'); // Landing page default
   const [user, setUser] = useState<User | null>(null);
   const [isMobileSidebarOpen, setMobileSidebarOpen] = useState(false);
   const [loadingAuth, setLoadingAuth] = useState(true);
@@ -91,7 +92,7 @@ function AppContent() {
     const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
       setUser(currentUser);
       setLoadingAuth(false);
-      // Do NOT auto-navigate to dashboard; landing remains default
+      if (currentUser) setCurrentScreen('dashboard'); // Only switch to dashboard if user logged in
     });
     return () => unsubscribe();
   }, []);
@@ -102,7 +103,7 @@ function AppContent() {
     setCurrentScreen('dashboard');
   };
   const handleLogout = async () => {
-    await signOut(auth);
+    await auth.signOut();
     setUser(null);
     setCurrentScreen('landing');
   };
@@ -144,19 +145,19 @@ function AppContent() {
       case 'support':
         return <SupportCenter onNavigate={setCurrentScreen} user={user} />;
       default:
-        return <LandingPage onGetStarted={handleGetStarted} />;
+        return <WebDashboard onNavigate={setCurrentScreen} user={user} />;
     }
   };
 
   if (loadingAuth)
     return (
-      <div className={`flex items-center justify-center h-screen ${mode === 'dark' ? 'bg-black' : 'bg-white'}`}>
-        <p className={`text-xl font-semibold ${mode === 'dark' ? 'text-white' : 'text-black'}`}>Loading...</p>
+      <div className={`flex justify-center items-center h-screen ${mode === 'dark' ? 'bg-black' : 'bg-white'}`}>
+        <p className={`text-lg ${mode === 'dark' ? 'text-white' : 'text-black'}`}>Loading...</p>
       </div>
     );
 
   return (
-    <div className={`flex flex-row min-h-screen ${mode === 'dark' ? 'bg-black' : 'bg-white'}`}>
+    <div className={`flex ${mode === 'dark' ? 'bg-black text-white' : 'bg-white text-black'} min-h-screen`}>
       {/* Mobile Menu Button */}
       <button
         onClick={() => setMobileSidebarOpen(!isMobileSidebarOpen)}
@@ -189,7 +190,7 @@ function AppContent() {
       />
 
       {/* Main Content */}
-      <main className="flex-1 lg:ml-64 min-h-screen p-4">
+      <div className="flex-1 lg:ml-64 min-h-screen p-4">
         <AnimatePresence mode="wait">
           <motion.div
             key={currentScreen}
@@ -202,7 +203,7 @@ function AppContent() {
             {renderScreen()}
           </motion.div>
         </AnimatePresence>
-      </main>
+      </div>
     </div>
   );
 }
