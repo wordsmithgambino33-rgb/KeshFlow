@@ -30,7 +30,8 @@ import { NativeWindStyleSheet } from 'nativewind';
 
 // Ensure NativeWind works correctly
 NativeWindStyleSheet.setOutput({
-  default: 'native',
+  default: 'native', // For mobile
+  web: 'native',     // For web (NativeWind)
 });
 
 export type Screen =
@@ -195,7 +196,14 @@ function AppContent() {
       {/* Main Content */}
       <View className="flex-1 lg:ml-64 min-h-screen p-4">
         <AnimatePresence mode="wait">
-          <motion.div key={currentScreen} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -20 }} transition={{ duration: 0.4, ease: 'easeInOut' }} className="h-full">
+          <motion.div
+            key={currentScreen}
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -20 }}
+            transition={{ duration: 0.4, ease: 'easeInOut' }}
+            className="h-full"
+          >
             {renderScreen()}
           </motion.div>
         </AnimatePresence>

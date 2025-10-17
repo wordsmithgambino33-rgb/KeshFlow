@@ -1,8 +1,16 @@
 
+/* Tailwind Directives - needed for web styling */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Google Fonts */
 @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&family=Inter:wght@300;400;500;600;700&display=swap');
 
+/* Custom Variant for dark mode */
 @custom-variant dark (&:is(.dark *));
 
+/* Root Variables - Light Mode */
 :root {
   --font-size: 16px;
   --background: #ffffff;
@@ -53,6 +61,7 @@
   --tax-reminder-glow: rgba(38, 166, 154, 0.25);
 }
 
+/* Dark Mode Variables */
 .dark {
   --background: #0a0a0a;
   --foreground: #fafafa;
@@ -139,5 +148,37 @@
   z-index: 0;
 }
 
-/* --- Remaining original CSS from your global.css --- */
-/* ... everything else (fonts, neon layers, gradients, body, dark mode, base layers, keyframes) stays intact ... */
+/* Keyframes for neon effects */
+@keyframes neonPulse {
+  0%, 100% { opacity: 0.6; transform: scale(1); }
+  50% { opacity: 0.9; transform: scale(1.05); }
+}
+
+@keyframes neonShift {
+  0%, 100% { transform: translate(0, 0); }
+  50% { transform: translate(5px, -5px); }
+}
+
+/* Body Base Styles */
+body {
+  font-family: 'Poppins', 'Inter', sans-serif;
+  font-size: var(--font-size);
+  background-color: var(--background);
+  color: var(--foreground);
+  margin: 0;
+  padding: 0;
+  line-height: 1.5;
+  transition: background 0.3s, color 0.3s;
+}
+
+/* Links */
+a {
+  color: var(--primary);
+  text-decoration: none;
+}
+
+a:hover {
+  text-decoration: underline;
+}
+
+/* Add other base styles as needed */

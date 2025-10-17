@@ -1,4 +1,7 @@
+
 import { registerRootComponent } from 'expo';
+import 'react-native-gesture-handler'; // Ensure gestures work on web and mobile
+import './styles/global.css'; // Import global CSS for web + Tailwind
 
 import App from './App';
 
