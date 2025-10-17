@@ -1,16 +1,10 @@
 
-  // App.tsx
+// App.tsx
 import React, { useEffect, useState } from "react";
-import { NavigationContainer } from "@react-navigation/native";
-import { createNativeStackNavigator } from "@react-navigation/native-stack";
+import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
 import { ThemeProvider, useTheme } from "./components/ThemeProvider";
 import { LandingPage } from "./components/LandingPage";
 import { WebDashboard } from "./pages/WebDashboard";
-import { StatusBar } from "expo-status-bar";
-import { View, ActivityIndicator } from "react-native";
-
-// Define stack
-const Stack = createNativeStackNavigator();
 
 // App content wrapped in theme logic
 function AppContent() {
@@ -24,33 +18,37 @@ function AppContent() {
 
   if (loading) {
     return (
-      <View
+      <div
         style={{
-          flex: 1,
+          height: "100vh",
           backgroundColor: mode === "dark" ? "#0a0a0a" : "#ffffff",
+          display: "flex",
           justifyContent: "center",
           alignItems: "center",
         }}
       >
-        <ActivityIndicator
-          size="large"
-          color={mode === "dark" ? "#26a69a" : "#00796B"}
+        <div
+          style={{
+            border: `4px solid ${mode === "dark" ? "#26a69a" : "#00796B"}`,
+            borderRadius: "50%",
+            width: "50px",
+            height: "50px",
+            borderTopColor: "transparent",
+            animation: "spin 1s linear infinite",
+          }}
         />
-      </View>
+      </div>
     );
   }
 
   return (
-    <NavigationContainer>
-      <StatusBar style={mode === "dark" ? "light" : "dark"} />
-      <Stack.Navigator
-        initialRouteName="Landing"
-        screenOptions={{ headerShown: false }}
-      >
-        <Stack.Screen name="Landing" component={LandingPage} />
-        <Stack.Screen name="Dashboard" component={WebDashboard} />
-      </Stack.Navigator>
-    </NavigationContainer>
+    <Router>
+      <Routes>
+        <Route path="/" element={<LandingPage />} />
+        <Route path="/dashboard" element={<WebDashboard />} />
+        <Route path="*" element={<Navigate to="/" />} /> {/* fallback */}
+      </Routes>
+    </Router>
   );
 }
 
