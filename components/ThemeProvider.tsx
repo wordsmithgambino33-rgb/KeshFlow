@@ -1,22 +1,14 @@
 
-// components/ThemeProvider.tsx
 import React, { createContext, useState, useEffect, useContext, ReactNode } from "react";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { doc, onSnapshot, setDoc, getDoc } from "firebase/firestore";
-import { auth, db } from "../firebase/config"; // use exported instances
+import { auth, db } from "../firebase/config";
 
 type ThemeMode = "light" | "dark";
 
-// Define basic theme objects to prevent 'themes is not defined' error
 const themes = {
-  light: {
-    background: "#fff",
-    text: "#000",
-  },
-  dark: {
-    background: "#000",
-    text: "#fff",
-  },
+  light: { background: "#fff", text: "#000" },
+  dark: { background: "#000", text: "#fff" },
 };
 
 interface ThemeContextProps {
@@ -31,14 +23,12 @@ const ThemeContext = createContext<ThemeContextProps | undefined>(undefined);
 export const ThemeProvider = ({ children }: { children: ReactNode }) => {
   const [mode, setModeState] = useState<ThemeMode>("light");
 
-  // Persist mode locally & in Firebase
   const setMode = async (newMode: ThemeMode) => {
     try {
       setModeState(newMode);
       await AsyncStorage.setItem("app-theme", newMode);
-
       const user = auth.currentUser;
-      if (user && user.uid) {
+      if (user) {
         const themeRef = doc(db, "users", user.uid);
         await setDoc(themeRef, { theme: newMode }, { merge: true });
       }
@@ -47,7 +37,6 @@ export const ThemeProvider = ({ children }: { children: ReactNode }) => {
     }
   };
 
-  // Load initial theme and listen for Firebase real-time changes
   useEffect(() => {
     let unsubscribe: (() => void) | undefined;
 
@@ -56,43 +45,27 @@ export const ThemeProvider = ({ children }: { children: ReactNode }) => {
         const user = auth.currentUser;
         let saved: string | null = null;
 
-        if (user && user.uid) {
+        if (user) {
           const themeRef = doc(db, "users", user.uid);
-
-          // Listen to real-time updates safely
           unsubscribe = onSnapshot(
             themeRef,
             (docSnap) => {
               if (docSnap.exists()) {
                 const remoteTheme = docSnap.data().theme;
-                if (remoteTheme === "light" || remoteTheme === "dark") {
-                  setModeState(remoteTheme);
-                }
+                if (remoteTheme === "light" || remoteTheme === "dark") setModeState(remoteTheme);
               }
             },
-            (error) => {
-              console.error("Firestore listener error:", error);
-            }
+            (err) => console.error("Firestore listener error:", err)
           );
 
-          // Try to get initial theme from Firestore
           const docSnap = await getDoc(themeRef);
-          if (docSnap.exists()) {
-            saved = docSnap.data().theme;
-          }
+          if (docSnap.exists()) saved = docSnap.data().theme;
         }
 
-        // Fallback to AsyncStorage
-        if (!saved) {
-          saved = await AsyncStorage.getItem("app-theme");
-        }
+        if (!saved) saved = await AsyncStorage.getItem("app-theme");
 
-        if (saved === "light" || saved === "dark") {
-          setModeState(saved);
-        } else {
-          const prefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
-          setModeState(prefersDark ? "dark" : "light");
-        }
+        if (saved === "light" || saved === "dark") setModeState(saved);
+        else setModeState(window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light");
       } catch (err) {
         console.warn("Theme load error:", err);
       }
@@ -100,37 +73,24 @@ export const ThemeProvider = ({ children }: { children: ReactNode }) => {
 
     loadTheme();
 
-    // Listen for system theme changes dynamically
     const mediaQuery = window.matchMedia("(prefers-color-scheme: dark)");
-    const handleChange = () => {
-      setModeState(mediaQuery.matches ? "dark" : "light");
-    };
+    const handleChange = () => setModeState(mediaQuery.matches ? "dark" : "light");
     mediaQuery.addEventListener("change", handleChange);
 
-    // Cleanup
     return () => {
       mediaQuery.removeEventListener("change", handleChange);
       if (unsubscribe) unsubscribe();
     };
   }, []);
 
-  // Toggle theme
   const toggleTheme = () => setMode(mode === "light" ? "dark" : "light");
-
   const theme = mode === "light" ? themes.light : themes.dark;
 
-  return (
-    <ThemeContext.Provider value={{ theme, mode, setMode, toggleTheme }}>
-      {children}
-    </ThemeContext.Provider>
-  );
+  return <ThemeContext.Provider value={{ theme, mode, setMode, toggleTheme }}>{children}</ThemeContext.Provider>;
 };
 
-// Custom hook for safe context access
 export const useTheme = (): ThemeContextProps => {
   const context = useContext(ThemeContext);
-  if (!context) {
-    throw new Error("useTheme must be used within a ThemeProvider");
-  }
+  if (!context) throw new Error("useTheme must be used within a ThemeProvider");
   return context;
 };

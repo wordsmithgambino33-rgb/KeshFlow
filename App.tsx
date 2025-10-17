@@ -2,7 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, Pressable } from 'react-native';
 import { motion, AnimatePresence } from 'motion/react';
-import { ThemeProvider } from './components/ThemeProvider';
+import { ThemeProvider, useTheme } from './components/ThemeProvider';
 import { LandingPage } from './components/LandingPage';
 import { WebDashboard } from './pages/WebDashboard';
 import { TransactionLogging } from './pages/TransactionLogging';
@@ -28,11 +28,7 @@ import { auth } from './firebase/config';
 import { onAuthStateChanged, User } from 'firebase/auth';
 import { NativeWindStyleSheet } from 'nativewind';
 
-// Ensure NativeWind works correctly
-NativeWindStyleSheet.setOutput({
-  default: 'native', // For mobile
-  web: 'native',     // For web (NativeWind)
-});
+NativeWindStyleSheet.setOutput({ default: 'native' });
 
 export type Screen =
   | 'landing'
@@ -55,17 +51,17 @@ export type Screen =
   | 'support';
 
 function AppContent() {
+  const { mode } = useTheme();
   const [currentScreen, setCurrentScreen] = useState<Screen>('landing');
   const [user, setUser] = useState<User | null>(null);
   const [isMobileSidebarOpen, setMobileSidebarOpen] = useState(false);
   const [loadingAuth, setLoadingAuth] = useState(true);
 
-  // Default tab title
+  // Update tab title
   useEffect(() => {
     document.title = 'KeshFlow';
   }, []);
 
-  // Dynamically update tab title based on current screen & optionally user
   useEffect(() => {
     const screenTitles: Record<Screen, string> = {
       landing: 'KeshFlow | Home',
@@ -106,7 +102,6 @@ function AppContent() {
     return () => unsubscribe();
   }, []);
 
-  // Handlers
   const handleGetStarted = () => setCurrentScreen('signup');
   const handleSignUpComplete = (user: User) => {
     setUser(user);
@@ -118,7 +113,6 @@ function AppContent() {
     setCurrentScreen('landing');
   };
 
-  // Render screens based on currentScreen
   const renderScreen = () => {
     switch (currentScreen) {
       case 'landing':
@@ -160,20 +154,15 @@ function AppContent() {
     }
   };
 
-  // Loading state
   if (loadingAuth)
     return (
-      <View className="flex-1 justify-center items-center bg-landing-neon">
-        <Text className="text-white text-lg">Loading...</Text>
+      <View className={`flex-1 justify-center items-center ${mode === 'dark' ? 'bg-black' : 'bg-white'}`}>
+        <Text className={`text-lg ${mode === 'dark' ? 'text-white' : 'text-black'}`}>Loading...</Text>
       </View>
     );
 
-  // User not logged in
-  if (!user) return <View className="flex-1 bg-landing-neon">{renderScreen()}</View>;
-
-  // Main app layout
   return (
-    <View className="flex-1 flex-row bg-landing-neon">
+    <View className={`flex-1 flex-row ${mode === 'dark' ? 'bg-black' : 'bg-white'}`}>
       {/* Mobile Menu Button */}
       <Pressable
         onPress={() => setMobileSidebarOpen(!isMobileSidebarOpen)}
@@ -188,10 +177,22 @@ function AppContent() {
       </View>
 
       {/* Web Sidebar */}
-      <WebSidebar currentScreen={currentScreen} onNavigate={setCurrentScreen} isOpen={true} onClose={() => {}} onLogout={handleLogout} />
+      <WebSidebar
+        currentScreen={currentScreen}
+        onNavigate={setCurrentScreen}
+        isOpen={true}
+        onClose={() => {}}
+        onLogout={handleLogout}
+      />
 
       {/* Mobile Sidebar */}
-      <MobileSidebar currentScreen={currentScreen} onNavigate={setCurrentScreen} isOpen={isMobileSidebarOpen} onClose={() => setMobileSidebarOpen(false)} onLogout={handleLogout} />
+      <MobileSidebar
+        currentScreen={currentScreen}
+        onNavigate={setCurrentScreen}
+        isOpen={isMobileSidebarOpen}
+        onClose={() => setMobileSidebarOpen(false)}
+        onLogout={handleLogout}
+      />
 
       {/* Main Content */}
       <View className="flex-1 lg:ml-64 min-h-screen p-4">
