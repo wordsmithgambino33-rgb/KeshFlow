@@ -16,7 +16,11 @@ module.exports = {
       colors: {
         'landing-neon': '#0f172a', // existing bg class
         'card': '#1e293b',
-        'border': '#334155'
+        'border': '#334155',
+        'primary': '#3b82f6',
+        'primary-foreground': '#ffffff',
+        'secondary': '#f97316',
+        'muted-foreground': '#cbd5e1'
       },
     },
   },
