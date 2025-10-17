@@ -1,5 +1,4 @@
 
-// LandingPage.tsx
 import React, { useEffect, useState } from 'react';
 import { motion } from 'motion/react';
 import {
@@ -35,7 +34,6 @@ export function LandingPage({ onGetStarted, onSignUp }: LandingPageProps) {
     supportAvailability: '24/7'
   });
 
-  // Demo anonymous login
   const handleDemo = async () => {
     setLoading(true);
     try {
@@ -50,7 +48,6 @@ export function LandingPage({ onGetStarted, onSignUp }: LandingPageProps) {
     }
   };
 
-  // Listen for auth changes and fetch user data
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (user) => {
       if (user) {
@@ -70,16 +67,13 @@ export function LandingPage({ onGetStarted, onSignUp }: LandingPageProps) {
     return () => unsubscribe();
   }, []);
 
-  // Fetch live stats
   useEffect(() => {
     const fetchStats = async () => {
       try {
-        // Total users
         const usersCol = collection(db, 'users');
         const usersSnap = await getDocs(usersCol);
         const totalUsers = usersSnap.size;
 
-        // Total money managed
         let totalMoney = 0;
         usersSnap.forEach((doc) => {
           const data = doc.data();
@@ -88,7 +82,6 @@ export function LandingPage({ onGetStarted, onSignUp }: LandingPageProps) {
           }
         });
 
-        // Example: user satisfaction (could be ratings stored in a collection)
         let totalRating = 0;
         let ratedUsers = 0;
         usersSnap.forEach((doc) => {
@@ -113,7 +106,6 @@ export function LandingPage({ onGetStarted, onSignUp }: LandingPageProps) {
 
     fetchStats();
 
-    // Optional: Real-time updates
     const usersQuery = collection(db, 'users');
     const unsubscribeStats = onSnapshot(usersQuery, () => fetchStats());
 
@@ -176,7 +168,7 @@ export function LandingPage({ onGetStarted, onSignUp }: LandingPageProps) {
         <ThemeToggle />
       </div>
 
-      {/* Hero Section omitted for brevity, same as previous code */}
+      {/* Hero Section omitted, same as your original */}
 
       {/* Stats Section */}
       <section className="py-20 px-6 lg:px-12">
@@ -188,52 +180,29 @@ export function LandingPage({ onGetStarted, onSignUp }: LandingPageProps) {
             viewport={{ once: true }}
             className="grid grid-cols-2 lg:grid-cols-4 gap-8"
           >
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6 }}
-              className="text-center"
-            >
-              <h3 className="text-3xl lg:text-4xl font-bold text-primary mb-2">{statsData.totalUsers}+</h3>
-              <p className="text-muted-foreground">Active Users</p>
-            </motion.div>
-
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6 }}
-              className="text-center"
-            >
-              <h3 className="text-3xl lg:text-4xl font-bold text-primary mb-2">
-                MWK {statsData.totalMoneyManaged.toLocaleString()}
-              </h3>
-              <p className="text-muted-foreground">Money Managed</p>
-            </motion.div>
-
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6 }}
-              className="text-center"
-            >
-              <h3 className="text-3xl lg:text-4xl font-bold text-primary mb-2">{statsData.userSatisfaction}%</h3>
-              <p className="text-muted-foreground">User Satisfaction</p>
-            </motion.div>
-
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6 }}
-              className="text-center"
-            >
-              <h3 className="text-3xl lg:text-4xl font-bold text-primary mb-2">{statsData.supportAvailability}</h3>
-              <p className="text-muted-foreground">Support</p>
-            </motion.div>
+            {['totalUsers', 'totalMoneyManaged', 'userSatisfaction', 'supportAvailability'].map((key, i) => {
+              const value = statsData[key as keyof typeof statsData];
+              const label = ['Active Users', 'Money Managed', 'User Satisfaction', 'Support'][i];
+              return (
+                <motion.div
+                  key={key}
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.6 }}
+                  className="text-center"
+                >
+                  <h3 className="text-3xl lg:text-4xl font-bold text-primary mb-2">
+                    {key === 'totalMoneyManaged' ? `MWK ${Number(value).toLocaleString()}` : value}
+                  </h3>
+                  <p className="text-muted-foreground">{label}</p>
+                </motion.div>
+              );
+            })}
           </motion.div>
         </div>
       </section>
 
-      {/* Features and Testimonials omitted, remain same */}
+      {/* Features and Testimonials sections remain the same */}
 
       {/* Footer */}
       <footer className="border-t border-border py-12 px-6 lg:px-12">
