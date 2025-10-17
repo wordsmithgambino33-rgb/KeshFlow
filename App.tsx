@@ -59,10 +59,42 @@ function AppContent() {
   const [isMobileSidebarOpen, setMobileSidebarOpen] = useState(false);
   const [loadingAuth, setLoadingAuth] = useState(true);
 
+  // Default tab title
   useEffect(() => {
     document.title = 'KeshFlow';
   }, []);
 
+  // Dynamically update tab title based on current screen & optionally user
+  useEffect(() => {
+    const screenTitles: Record<Screen, string> = {
+      landing: 'KeshFlow | Home',
+      signup: 'KeshFlow | Sign Up',
+      dashboard: 'KeshFlow | Dashboard',
+      transactions: 'KeshFlow | Transactions',
+      budget: 'KeshFlow | Budget',
+      reports: 'KeshFlow | Reports',
+      goals: 'KeshFlow | Goals & Saving',
+      portfolio: 'KeshFlow | Portfolio',
+      bills: 'KeshFlow | Bills & Subscriptions',
+      education: 'KeshFlow | Education Center',
+      marketplace: 'KeshFlow | Marketplace',
+      community: 'KeshFlow | Community',
+      taxes: 'KeshFlow | Tax Management',
+      insurance: 'KeshFlow | Insurance Hub',
+      'financial-health': 'KeshFlow | Financial Health',
+      profile: 'KeshFlow | Profile',
+      settings: 'KeshFlow | Settings',
+      support: 'KeshFlow | Support',
+    };
+
+    if (user && currentScreen === 'dashboard') {
+      document.title = `KeshFlow | Dashboard (${user.displayName || 'User'})`;
+    } else {
+      document.title = screenTitles[currentScreen] || 'KeshFlow';
+    }
+  }, [currentScreen, user]);
+
+  // Firebase auth listener
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
       setUser(currentUser);
@@ -73,30 +105,25 @@ function AppContent() {
     return () => unsubscribe();
   }, []);
 
+  // Handlers
   const handleGetStarted = () => setCurrentScreen('signup');
-
   const handleSignUpComplete = (user: User) => {
     setUser(user);
     setCurrentScreen('dashboard');
   };
-
   const handleLogout = async () => {
     await auth.signOut();
     setUser(null);
     setCurrentScreen('landing');
   };
 
+  // Render screens based on currentScreen
   const renderScreen = () => {
     switch (currentScreen) {
       case 'landing':
         return <LandingPage onGetStarted={handleGetStarted} />;
       case 'signup':
-        return (
-          <SignUpAuth
-            onBack={() => setCurrentScreen('landing')}
-            onSignUpComplete={handleSignUpComplete}
-          />
-        );
+        return <SignUpAuth onBack={() => setCurrentScreen('landing')} onSignUpComplete={handleSignUpComplete} />;
       case 'dashboard':
         return <WebDashboard onNavigate={setCurrentScreen} user={user} />;
       case 'transactions':
@@ -132,6 +159,7 @@ function AppContent() {
     }
   };
 
+  // Loading state
   if (loadingAuth)
     return (
       <View className="flex-1 justify-center items-center bg-landing-neon">
@@ -139,10 +167,10 @@ function AppContent() {
       </View>
     );
 
-  if (!user) {
-    return <View className="flex-1 bg-landing-neon">{renderScreen()}</View>;
-  }
+  // User not logged in
+  if (!user) return <View className="flex-1 bg-landing-neon">{renderScreen()}</View>;
 
+  // Main app layout
   return (
     <View className="flex-1 flex-row bg-landing-neon">
       {/* Mobile Menu Button */}
@@ -159,34 +187,15 @@ function AppContent() {
       </View>
 
       {/* Web Sidebar */}
-      <WebSidebar
-        currentScreen={currentScreen}
-        onNavigate={setCurrentScreen}
-        isOpen={true}
-        onClose={() => {}}
-        onLogout={handleLogout}
-      />
+      <WebSidebar currentScreen={currentScreen} onNavigate={setCurrentScreen} isOpen={true} onClose={() => {}} onLogout={handleLogout} />
 
       {/* Mobile Sidebar */}
-      <MobileSidebar
-        currentScreen={currentScreen}
-        onNavigate={setCurrentScreen}
-        isOpen={isMobileSidebarOpen}
-        onClose={() => setMobileSidebarOpen(false)}
-        onLogout={handleLogout}
-      />
+      <MobileSidebar currentScreen={currentScreen} onNavigate={setCurrentScreen} isOpen={isMobileSidebarOpen} onClose={() => setMobileSidebarOpen(false)} onLogout={handleLogout} />
 
       {/* Main Content */}
       <View className="flex-1 lg:ml-64 min-h-screen p-4">
         <AnimatePresence mode="wait">
-          <motion.div
-            key={currentScreen}
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -20 }}
-            transition={{ duration: 0.4, ease: 'easeInOut' }}
-            className="h-full"
-          >
+          <motion.div key={currentScreen} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -20 }} transition={{ duration: 0.4, ease: 'easeInOut' }} className="h-full">
             {renderScreen()}
           </motion.div>
         </AnimatePresence>
