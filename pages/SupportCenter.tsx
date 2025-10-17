@@ -7,7 +7,7 @@ import {
   HelpCircle,
   MessageCircle,
   Phone,
-  Mail,
+  Mail, 
   Book,
   Search,
 } from "lucide-react";

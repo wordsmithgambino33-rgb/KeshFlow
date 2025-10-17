@@ -1,3 +1,4 @@
+
 // PortfolioPage.tsx
 import React, { useEffect, useMemo, useState } from 'react';
 import { motion } from 'motion/react';
@@ -755,5 +756,4 @@ export function PortfolioPage({ onNavigate }: PortfolioPageProps) {
       )}
     </div>
   );
-}
 }

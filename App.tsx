@@ -1,5 +1,6 @@
 
 import React, { useState, useEffect } from 'react';
+import { View, Text, Pressable } from 'react-native';
 import { motion, AnimatePresence } from 'motion/react';
 import { ThemeProvider } from './components/ThemeProvider';
 import { LandingPage } from './components/LandingPage';
@@ -10,7 +11,7 @@ import { ReportsAnalytics } from './pages/ReportsAnalytics';
 import { GoalsSaving } from './pages/GoalsSaving';
 import { PortfolioPage } from './pages/PortfolioPage';
 import { BillsSubscriptions } from './pages/BillsSubscriptions';
-import { EducationCenter } from './pages/EducationCenter'
+import { EducationCenter } from './pages/EducationCenter';
 import { Marketplace } from './pages/MarketPlace';
 import { Community } from './pages/Community';
 import { TaxManagement } from './pages/TaxManagement';
@@ -25,6 +26,12 @@ import { ThemeToggle } from './ui/ThemeToggle';
 import { Menu, X } from 'lucide-react';
 import { auth } from './firebase/config';
 import { onAuthStateChanged, User } from 'firebase/auth';
+import { NativeWindStyleSheet } from 'nativewind';
+
+// Ensure NativeWind works correctly
+NativeWindStyleSheet.setOutput({
+  default: 'native',
+});
 
 export type Screen =
   | 'landing'
@@ -52,12 +59,10 @@ function AppContent() {
   const [isMobileSidebarOpen, setMobileSidebarOpen] = useState(false);
   const [loadingAuth, setLoadingAuth] = useState(true);
 
-  // Set the document title globally
   useEffect(() => {
     document.title = 'KeshFlow';
-  }, []);  // Empty array: Runs once on component mount
+  }, []);
 
-  // Listen for Firebase auth state
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
       setUser(currentUser);
@@ -86,7 +91,12 @@ function AppContent() {
       case 'landing':
         return <LandingPage onGetStarted={handleGetStarted} />;
       case 'signup':
-        return <SignUpAuth onBack={() => setCurrentScreen('landing')} onSignUpComplete={handleSignUpComplete} />;
+        return (
+          <SignUpAuth
+            onBack={() => setCurrentScreen('landing')}
+            onSignUpComplete={handleSignUpComplete}
+          />
+        );
       case 'dashboard':
         return <WebDashboard onNavigate={setCurrentScreen} user={user} />;
       case 'transactions':
@@ -122,26 +132,31 @@ function AppContent() {
     }
   };
 
-  if (loadingAuth) return <p>Loading...</p>;
+  if (loadingAuth)
+    return (
+      <View className="flex-1 justify-center items-center bg-landing-neon">
+        <Text className="text-white text-lg">Loading...</Text>
+      </View>
+    );
 
   if (!user) {
-    return <div className="min-h-screen bg-landing-neon">{renderScreen()}</div>;
+    return <View className="flex-1 bg-landing-neon">{renderScreen()}</View>;
   }
 
   return (
-    <div className="min-h-screen bg-landing-neon flex">
+    <View className="flex-1 flex-row bg-landing-neon">
       {/* Mobile Menu Button */}
-      <button
-        onClick={() => setMobileSidebarOpen(!isMobileSidebarOpen)}
+      <Pressable
+        onPress={() => setMobileSidebarOpen(!isMobileSidebarOpen)}
         className="lg:hidden fixed top-4 left-4 z-50 p-2 rounded-lg bg-card/80 backdrop-blur-sm border border-border shadow-lg"
       >
         {isMobileSidebarOpen ? <X size={20} /> : <Menu size={20} />}
-      </button>
+      </Pressable>
 
       {/* Theme Toggle */}
-      <div className="fixed top-4 right-4 z-50">
+      <View className="fixed top-4 right-4 z-50">
         <ThemeToggle />
-      </div>
+      </View>
 
       {/* Web Sidebar */}
       <WebSidebar
@@ -162,7 +177,7 @@ function AppContent() {
       />
 
       {/* Main Content */}
-      <div className="flex-1 lg:ml-64 min-h-screen p-4">
+      <View className="flex-1 lg:ml-64 min-h-screen p-4">
         <AnimatePresence mode="wait">
           <motion.div
             key={currentScreen}
@@ -175,8 +190,8 @@ function AppContent() {
             {renderScreen()}
           </motion.div>
         </AnimatePresence>
-      </div>
-    </div>
+      </View>
+    </View>
   );
 }
 

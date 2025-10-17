@@ -1,6 +1,6 @@
+
 // components/ThemeProvider.tsx
 import React, { createContext, useState, useEffect, useContext, ReactNode } from "react";
-import { Appearance } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { doc, onSnapshot, setDoc, getDoc } from "firebase/firestore";
 import { auth, db } from "../firebase/config"; // use exported instances
@@ -90,8 +90,8 @@ export const ThemeProvider = ({ children }: { children: ReactNode }) => {
         if (saved === "light" || saved === "dark") {
           setModeState(saved);
         } else {
-          const systemTheme = Appearance.getColorScheme() as ThemeMode;
-          setModeState(systemTheme || "light");
+          const prefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
+          setModeState(prefersDark ? "dark" : "light");
         }
       } catch (err) {
         console.warn("Theme load error:", err);
@@ -101,14 +101,15 @@ export const ThemeProvider = ({ children }: { children: ReactNode }) => {
     loadTheme();
 
     // Listen for system theme changes dynamically
-    const sub = Appearance.addChangeListener(({ colorScheme }) => {
-      if (!colorScheme) return;
-      setModeState(colorScheme as ThemeMode);
-    });
+    const mediaQuery = window.matchMedia("(prefers-color-scheme: dark)");
+    const handleChange = () => {
+      setModeState(mediaQuery.matches ? "dark" : "light");
+    };
+    mediaQuery.addEventListener("change", handleChange);
 
     // Cleanup
     return () => {
-      sub.remove();
+      mediaQuery.removeEventListener("change", handleChange);
       if (unsubscribe) unsubscribe();
     };
   }, []);
@@ -129,10 +130,6 @@ export const ThemeProvider = ({ children }: { children: ReactNode }) => {
 export const useTheme = (): ThemeContextProps => {
   const context = useContext(ThemeContext);
   if (!context) {
-    throw new Error("useTheme must be used within a ThemeProvider");
-  }
-  return context;
-};
     throw new Error("useTheme must be used within a ThemeProvider");
   }
   return context;
