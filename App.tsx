@@ -1,58 +1,54 @@
 
 // App.tsx
 import React, { useEffect, useState } from "react";
-import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
+import { NavigationContainer } from "@react-navigation/native";
+import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { ThemeProvider, useTheme } from "./components/ThemeProvider";
 import { LandingPage } from "./components/LandingPage";
 import { WebDashboard } from "./pages/WebDashboard";
+import { StatusBar } from "expo-status-bar";
+import { View, ActivityIndicator } from "react-native";
 
-// App content wrapped in theme logic
+const Stack = createNativeStackNavigator();
+
 function AppContent() {
   const { mode } = useTheme();
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const timer = setTimeout(() => setLoading(false), 1000); // Simulate initial load
+    const timer = setTimeout(() => setLoading(false), 1000);
     return () => clearTimeout(timer);
   }, []);
 
   if (loading) {
     return (
-      <div
+      <View
         style={{
-          height: "100vh",
+          flex: 1,
           backgroundColor: mode === "dark" ? "#0a0a0a" : "#ffffff",
-          display: "flex",
           justifyContent: "center",
           alignItems: "center",
         }}
       >
-        <div
-          style={{
-            border: `4px solid ${mode === "dark" ? "#26a69a" : "#00796B"}`,
-            borderRadius: "50%",
-            width: "50px",
-            height: "50px",
-            borderTopColor: "transparent",
-            animation: "spin 1s linear infinite",
-          }}
+        <ActivityIndicator
+          size="large"
+          color={mode === "dark" ? "#26a69a" : "#00796B"}
         />
-      </div>
+      </View>
     );
   }
 
   return (
-    <Router>
-      <Routes>
-        <Route path="/" element={<LandingPage />} />
-        <Route path="/dashboard" element={<WebDashboard />} />
-        <Route path="*" element={<Navigate to="/" />} /> {/* fallback */}
-      </Routes>
-    </Router>
+    <NavigationContainer>
+      <StatusBar style={mode === "dark" ? "light" : "dark"} />
+      <Stack.Navigator initialRouteName="Landing" screenOptions={{ headerShown: false }}>
+        <Stack.Screen name="Landing" component={LandingPage} />
+        <Stack.Screen name="Dashboard" component={WebDashboard} />
+      </Stack.Navigator>
+    </NavigationContainer>
   );
 }
 
-// Root component
 export default function App() {
   return (
     <ThemeProvider>

@@ -1,68 +1,15 @@
 
-/* Tailwind Directives - needed for web styling */
+/* 1️⃣ Google Fonts must be first */
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&family=Inter:wght@300;400;500;600;700&display=swap');
+
+/* 2️⃣ Tailwind Directives - needed for web styling */
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-/* Google Fonts */
-@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&family=Inter:wght@300;400;500;600;700&display=swap');
-
-/* Custom Variant for dark mode */
-@custom-variant dark (&:is(.dark *));
-
-/* Root Variables - Light Mode */
-:root {
-  --font-size: 16px;
-  --background: #ffffff;
-  --foreground: #1a1a1a;
-  --card: #ffffff;
-  --card-foreground: #1a1a1a;
-  --popover: #ffffff;
-  --popover-foreground: #1a1a1a;
-  --primary: #00796B;
-  --primary-foreground: #ffffff;
-  --secondary: #f0fdf4;
-  --secondary-foreground: #00796B;
-  --muted: #f8f9fa;
-  --muted-foreground: #6c757d;
-  --accent: #E8F5E8;
-  --accent-foreground: #00796B;
-  --destructive: #dc2626;
-  --destructive-foreground: #ffffff;
-  --border: rgba(0, 0, 0, 0.1);
-  --input: transparent;
-  --input-background: #ffffff;
-  --switch-background: #e2e8f0;
-  --font-weight-medium: 500;
-  --font-weight-normal: 400;
-  --ring: #00796B;
-  --chart-1: #00796B;
-  --chart-2: #1E88E5;
-  --chart-3: #FF7043;
-  --chart-4: #FFC107;
-  --chart-5: #9C27B0;
-  --radius: 0.625rem;
-  --bg-gradient-start: #f1f5f9;
-  --bg-gradient-middle: #e0e7ff;
-  --bg-gradient-end: #c7d2fe;
-  --bg-accent: rgba(139, 92, 246, 0.08);
-  --bg-overlay: rgba(255, 255, 255, 0.4);
-  --sidebar: #ffffff;
-  --sidebar-foreground: #1a1a1a;
-  --sidebar-primary: #00796B;
-  --sidebar-primary-foreground: #ffffff;
-  --sidebar-accent: #f8f9fa;
-  --sidebar-accent-foreground: #1a1a1a;
-  --sidebar-border: rgba(0, 0, 0, 0.1);
-  --sidebar-ring: #00796B;
-
-  /* Tax Reminder Variables */
-  --tax-reminder-color: #26a69a;
-  --tax-reminder-glow: rgba(38, 166, 154, 0.25);
-}
-
-/* Dark Mode Variables */
+/* 3️⃣ Dark mode support: replace @custom-variant */
 .dark {
+  /* Dark Mode Variables */
   --background: #0a0a0a;
   --foreground: #fafafa;
   --card: #111111;
@@ -111,14 +58,62 @@
   --landing-bg-start: #0a0a0f;
   --landing-bg-middle: #1a0a1f;
   --landing-bg-end: #0f1a2a;
-
-  /* Tax Reminder Variables Dark Mode */
   --tax-reminder-color: #ff6b9d;
   --tax-reminder-glow: rgba(255, 107, 157, 0.3);
 }
 
-/* Tax Reminder Neon Layer */
-.tax-reminder-active::before {
+/* Root Variables - Light Mode */
+:root {
+  --font-size: 16px;
+  --background: #ffffff;
+  --foreground: #1a1a1a;
+  --card: #ffffff;
+  --card-foreground: #1a1a1a;
+  --popover: #ffffff;
+  --popover-foreground: #1a1a1a;
+  --primary: #00796B;
+  --primary-foreground: #ffffff;
+  --secondary: #f0fdf4;
+  --secondary-foreground: #00796B;
+  --muted: #f8f9fa;
+  --muted-foreground: #6c757d;
+  --accent: #E8F5E8;
+  --accent-foreground: #00796B;
+  --destructive: #dc2626;
+  --destructive-foreground: #ffffff;
+  --border: rgba(0, 0, 0, 0.1);
+  --input: transparent;
+  --input-background: #ffffff;
+  --switch-background: #e2e8f0;
+  --font-weight-medium: 500;
+  --font-weight-normal: 400;
+  --ring: #00796B;
+  --chart-1: #00796B;
+  --chart-2: #1E88E5;
+  --chart-3: #FF7043;
+  --chart-4: #FFC107;
+  --chart-5: #9C27B0;
+  --radius: 0.625rem;
+  --bg-gradient-start: #f1f5f9;
+  --bg-gradient-middle: #e0e7ff;
+  --bg-gradient-end: #c7d2fe;
+  --bg-accent: rgba(139, 92, 246, 0.08);
+  --bg-overlay: rgba(255, 255, 255, 0.4);
+  --sidebar: #ffffff;
+  --sidebar-foreground: #1a1a1a;
+  --sidebar-primary: #00796B;
+  --sidebar-primary-foreground: #ffffff;
+  --sidebar-accent: #f8f9fa;
+  --sidebar-accent-foreground: #1a1a1a;
+  --sidebar-border: rgba(0, 0, 0, 0.1);
+  --sidebar-ring: #00796B;
+  --tax-reminder-color: #26a69a;
+  --tax-reminder-glow: rgba(38, 166, 154, 0.25);
+}
+
+/* Tax Reminder Neon Layer and Animations */
+.tax-reminder-active::before,
+.tax-reminder-active::after {
   content: '';
   position: absolute;
   top: -20%;
@@ -132,28 +127,16 @@
   pointer-events: none;
   z-index: 0;
 }
-
 .tax-reminder-active::after {
-  content: '';
-  position: absolute;
-  top: -10%;
-  left: -10%;
-  right: -10%;
-  bottom: -10%;
-  background: radial-gradient(circle at center, var(--tax-reminder-glow) 0%, transparent 50%);
   filter: blur(100px);
   opacity: 0.4;
   animation: neonShift 5s ease-in-out infinite reverse;
-  pointer-events: none;
-  z-index: 0;
 }
 
-/* Keyframes for neon effects */
 @keyframes neonPulse {
   0%, 100% { opacity: 0.6; transform: scale(1); }
   50% { opacity: 0.9; transform: scale(1.05); }
 }
-
 @keyframes neonShift {
   0%, 100% { transform: translate(0, 0); }
   50% { transform: translate(5px, -5px); }
@@ -176,9 +159,6 @@ a {
   color: var(--primary);
   text-decoration: none;
 }
-
 a:hover {
   text-decoration: underline;
 }
-
-/* Add other base styles as needed */
