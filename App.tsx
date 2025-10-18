@@ -77,9 +77,9 @@ export default function App() {
       case "literacy":
         return <FinancialLiteracyLibrary />;
       case "goals":
-        return <GoalsSaving />;
+        return <GoalsSaving onBack={() => handleNavigate("dashboard")} />;
       case "insurance":
-        return <InsuranceHub />;
+        return <InsuranceHub onNavigate={handleNavigate} />;
       case "marketplace":
         return <MarketPlace />;
       case "portfolio":
@@ -95,7 +95,7 @@ export default function App() {
       case "transactions":
         return <TransactionLogging />;
       default:
-        return <div>Screen not found</div>;
+        return <div className="p-6 text-center text-red-500">Screen not found</div>;
     }
   };
 
@@ -103,12 +103,12 @@ export default function App() {
     <ThemeContextProvider>
       <BudgetProvider>
         <ThemeProvider>
-          <div style={{ display: "flex", minHeight: "100vh", fontFamily: "sans-serif" }}>
+          <div className="flex min-h-screen font-sans bg-background">
             {/* Sidebar */}
             <WebSidebar currentScreen={currentScreen} onNavigate={handleNavigate} />
 
             {/* Main Content */}
-            <div style={{ flex: 1, padding: "1rem", overflow: "auto" }}>
+            <div className="flex-1 p-4 lg:p-6 overflow-auto">
               {/* Quick Buttons */}
               <ButtonNavigation currentScreen={currentScreen} onNavigate={handleNavigate} />
               {/* Active Page */}
