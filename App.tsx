@@ -1,58 +1,122 @@
 
-// App.tsx
-import React, { useEffect, useState } from "react";
-import { NavigationContainer } from "@react-navigation/native";
-import { createNativeStackNavigator } from "@react-navigation/native-stack";
-import { ThemeProvider, useTheme } from "./components/ThemeProvider";
-import { LandingPage } from "./components/LandingPage";
-import { WebDashboard } from "./pages/WebDashboard";
-import { StatusBar } from "expo-status-bar";
-import { View, ActivityIndicator } from "react-native";
+import React, { useState } from "react";
 
-const Stack = createNativeStackNavigator();
+// Pages
+import WebDashboard from "./pages/WebDashboard";
+import BillsSubscriptions from "./pages/BillsSubscriptions";
+import Community from "./pages/Community";
+import EducationCenter from "./pages/EducationCenter";
+import EnhancedBudgetManagement from "./pages/EnhancedBudgetManagement";
+import FinancialHealthScore from "./pages/FinancialHealthScore";
+import FinancialLiteracyLibrary from "./pages/FinancialLiteracyLibrary";
+import GoalsSaving from "./pages/GoalsSaving";
+import InsuranceHub from "./pages/InsuranceHub";
+import MarketPlace from "./pages/MarketPlace";
+import PortfolioPage from "./pages/PortfolioPage";
+import ProfileSettings from "./pages/ProfileSettings";
+import ReportsAnalytics from "./pages/ReportsAnalytics";
+import SupportCenter from "./pages/SupportCenter";
+import TaxManagement from "./pages/TaxManagement";
+import TransactionLogging from "./pages/TransactionLogging";
 
-function AppContent() {
-  const { mode } = useTheme();
-  const [loading, setLoading] = useState(true);
+// Components
+import LandingPage from "./components/LandingPage";
+import WebSidebar from "./components/WebSidebar";
+import ButtonNavigation from "./components/ButtonNavigation";
+import { ThemeProvider } from "./components/ThemeProvider";
 
-  useEffect(() => {
-    const timer = setTimeout(() => setLoading(false), 1000);
-    return () => clearTimeout(timer);
-  }, []);
+// Context
+import { BudgetProvider } from "./context/budget_context";
+import { ThemeContextProvider } from "./context/ThemeContext";
 
-  if (loading) {
-    return (
-      <View
-        style={{
-          flex: 1,
-          backgroundColor: mode === "dark" ? "#0a0a0a" : "#ffffff",
-          justifyContent: "center",
-          alignItems: "center",
-        }}
-      >
-        <ActivityIndicator
-          size="large"
-          color={mode === "dark" ? "#26a69a" : "#00796B"}
-        />
-      </View>
-    );
-  }
+// Styles
+import "./styles/global.css";
 
-  return (
-    <NavigationContainer>
-      <StatusBar style={mode === "dark" ? "light" : "dark"} />
-      <Stack.Navigator initialRouteName="Landing" screenOptions={{ headerShown: false }}>
-        <Stack.Screen name="Landing" component={LandingPage} />
-        <Stack.Screen name="Dashboard" component={WebDashboard} />
-      </Stack.Navigator>
-    </NavigationContainer>
-  );
-}
+export type Screen =
+  | "landing"
+  | "dashboard"
+  | "bills"
+  | "community"
+  | "education"
+  | "enhanced-budget"
+  | "health-score"
+  | "literacy"
+  | "goals"
+  | "insurance"
+  | "marketplace"
+  | "portfolio"
+  | "profile"
+  | "reports"
+  | "support"
+  | "tax"
+  | "transactions";
 
 export default function App() {
+  const [currentScreen, setCurrentScreen] = useState<Screen>("landing");
+
+  const handleNavigate = (screen: Screen) => {
+    setCurrentScreen(screen);
+  };
+
+  const renderScreen = () => {
+    switch (currentScreen) {
+      case "landing":
+        return <LandingPage onNavigate={handleNavigate} />;
+      case "dashboard":
+        return <WebDashboard onNavigate={handleNavigate} />;
+      case "bills":
+        return <BillsSubscriptions />;
+      case "community":
+        return <Community />;
+      case "education":
+        return <EducationCenter />;
+      case "enhanced-budget":
+        return <EnhancedBudgetManagement />;
+      case "health-score":
+        return <FinancialHealthScore />;
+      case "literacy":
+        return <FinancialLiteracyLibrary />;
+      case "goals":
+        return <GoalsSaving />;
+      case "insurance":
+        return <InsuranceHub />;
+      case "marketplace":
+        return <MarketPlace />;
+      case "portfolio":
+        return <PortfolioPage />;
+      case "profile":
+        return <ProfileSettings />;
+      case "reports":
+        return <ReportsAnalytics />;
+      case "support":
+        return <SupportCenter />;
+      case "tax":
+        return <TaxManagement />;
+      case "transactions":
+        return <TransactionLogging />;
+      default:
+        return <div>Screen not found</div>;
+    }
+  };
+
   return (
-    <ThemeProvider>
-      <AppContent />
-    </ThemeProvider>
+    <ThemeContextProvider>
+      <BudgetProvider>
+        <ThemeProvider>
+          <div style={{ display: "flex", minHeight: "100vh", fontFamily: "sans-serif" }}>
+            {/* Sidebar */}
+            <WebSidebar currentScreen={currentScreen} onNavigate={handleNavigate} />
+
+            {/* Main Content */}
+            <div style={{ flex: 1, padding: "1rem", overflow: "auto" }}>
+              {/* Quick Buttons */}
+              <ButtonNavigation currentScreen={currentScreen} onNavigate={handleNavigate} />
+              {/* Active Page */}
+              {renderScreen()}
+            </div>
+          </div>
+        </ThemeProvider>
+      </BudgetProvider>
+    </ThemeContextProvider>
   );
 }

@@ -1,5 +1,4 @@
 
-
 "use client";
 
 import React, { useState, useEffect } from 'react';
@@ -53,8 +52,15 @@ export function InsuranceHub({ onNavigate }: InsuranceHubProps) {
     }
   };
 
+  const INSURANCE_OPTIONS = [
+    { type: 'Life Insurance', icon: Heart, color: 'text-red-500', desc: "Protect your family's financial future" },
+    { type: 'Motor Insurance', icon: Car, color: 'text-blue-500', desc: 'Comprehensive vehicle coverage' },
+    { type: 'Property Insurance', icon: Home, color: 'text-green-500', desc: 'Protect your home and belongings' },
+    { type: 'Business Insurance', icon: Briefcase, color: 'text-purple-500', desc: 'Safeguard your business operations' },
+  ];
+
   return (
-    <div className="min-h-screen p-4 lg:p-8">
+    <div className="min-h-screen p-4 lg:p-8 bg-gradient-to-br from-gray-50 to-gray-200">
       <div className="max-w-7xl mx-auto space-y-8">
         {/* Header */}
         <div className="text-center">
@@ -64,7 +70,7 @@ export function InsuranceHub({ onNavigate }: InsuranceHubProps) {
             </div>
             Insurance Hub
           </h1>
-          <p className="text-muted-foreground max-w-2xl mx-auto">
+          <p className="text-gray-600 max-w-2xl mx-auto">
             Protect yourself and your family with comprehensive insurance solutions tailored for Malawi.
           </p>
         </div>
@@ -73,24 +79,19 @@ export function InsuranceHub({ onNavigate }: InsuranceHubProps) {
         <motion.div
           initial={{ opacity: 0, y: 50 }}
           animate={{ opacity: 1, y: 0 }}
-          className="text-center py-20"
+          className="text-center py-12"
         >
           <div className="mb-8">
             <Shield className="w-24 h-24 text-primary mx-auto mb-4" />
             <h2 className="text-2xl font-semibold mb-4">Insurance Tools Coming Soon!</h2>
-            <p className="text-muted-foreground max-w-md mx-auto">
+            <p className="text-gray-600 max-w-md mx-auto">
               We're partnering with leading insurance providers in Malawi to bring you 
               comprehensive coverage options and policy management tools.
             </p>
           </div>
 
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6 max-w-6xl mx-auto mb-8">
-            {[
-              { type: 'Life Insurance', icon: Heart, color: 'text-red-500', desc: "Protect your family's financial future" },
-              { type: 'Motor Insurance', icon: Car, color: 'text-blue-500', desc: 'Comprehensive vehicle coverage' },
-              { type: 'Property Insurance', icon: Home, color: 'text-green-500', desc: 'Protect your home and belongings' },
-              { type: 'Business Insurance', icon: Briefcase, color: 'text-purple-500', desc: 'Safeguard your business operations' },
-            ].map((insurance) => {
+            {INSURANCE_OPTIONS.map((insurance) => {
               const Icon = insurance.icon;
               return (
                 <Card
@@ -100,7 +101,7 @@ export function InsuranceHub({ onNavigate }: InsuranceHubProps) {
                 >
                   <Icon className={`w-8 h-8 ${insurance.color} mx-auto mb-3`} />
                   <h3 className="font-semibold mb-2">{insurance.type}</h3>
-                  <p className="text-sm text-muted-foreground">{insurance.desc}</p>
+                  <p className="text-sm text-gray-500">{insurance.desc}</p>
                 </Card>
               );
             })}
@@ -109,15 +110,16 @@ export function InsuranceHub({ onNavigate }: InsuranceHubProps) {
           <Button
             size="lg"
             onClick={() => toast.info('Insurance quotes feature coming soon!')}
+            className="bg-gradient-to-r from-green-500 to-teal-500 text-white"
           >
             Get Insurance Quotes
           </Button>
         </motion.div>
 
         {/* Chichewa Tips */}
-        <Card className="p-6 bg-gradient-to-r from-primary/5 to-blue-500/5 border-primary/20">
+        <Card className="p-6 bg-gradient-to-r from-primary/5 to-blue-500/5 border border-primary/20">
           <h3 className="font-semibold mb-2">🛡️ Insurance Tip / Malangizo a Chitetezo</h3>
-          <p className="text-sm text-muted-foreground">
+          <p className="text-sm text-gray-600">
             <strong>English:</strong> Insurance is an investment in peace of mind. Start with basic life and health coverage, then expand as your needs grow.<br />
             <strong>Chichewa:</strong> Insurance ndi ndalama zomwe mumaika kuti mukhale ndi mtendere. Yambani ndi chitetezo cha moyo ndi thanzi, kenako onjezani monga zosowa zanu zikukula.
           </p>

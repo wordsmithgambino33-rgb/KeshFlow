@@ -1,34 +1,36 @@
+//firebase/config.js
 
-// firebaseConfig.js
-
-// Imported functions
+// Import the core Firebase SDK and required services
 import { initializeApp } from "firebase/app";
-import { getAnalytics } from "firebase/analytics";
-import { getFirestore } from "firebase/firestore";
+import { getAnalytics, isSupported } from "firebase/analytics";
 import { getAuth } from "firebase/auth";
+import { getFirestore } from "firebase/firestore";
 import { getStorage } from "firebase/storage";
 
-//  web app's Firebase configuration
+// web app's Firebase configuration
 const firebaseConfig = {
-  apiKey: "AIzaSyDFUFA8KT0fK20Pr-vyw67nKlFBh7Jolvg",
-  authDomain: "keshflow-1bcc7.firebaseapp.com",
-  projectId: "keshflow-1bcc7",
-  storageBucket: "keshflow-1bcc7.appspot.com",  // correct format
-  messagingSenderId: "146775562351",
-  appId: "1:146775562351:web:3022c865fc6dc0535c159a",
-  measurementId: "G-RQE56XEFQ7"
+  apiKey: "AIzaSyBi8gXy5Vgl2ioGl0RIkk7eMECgLNkj5XE",
+  authDomain: "keshflow-e033a.firebaseapp.com",
+  projectId: "keshflow-e033a",
+  storageBucket: "keshflow-e033a.appspot.com", // ✅ fixed .app to .appspot.com
+  messagingSenderId: "433232152835",
+  appId: "1:433232152835:web:2cba760d0b0f3a239b4136",
+  measurementId: "G-Q35G5GRSX6"
 };
 
-// Initialize Firebase app
+// Initialize Firebase
 const app = initializeApp(firebaseConfig);
 
-// Optional: Initialize Analytics
-const analytics = getAnalytics(app);
+// Initialize services
+const auth = getAuth(app);
+const db = getFirestore(app);
+const storage = getStorage(app);
 
-// Initialize Firebase services
-const db = getFirestore(app);        // Firestore
-const auth = getAuth(app);           // Firebase Authentication
-const storage = getStorage(app);     // Firebase Storage
+// Initialize Analytics only if supported (avoids browser errors)
+let analytics;
+isSupported().then((yes) => {
+  if (yes) analytics = getAnalytics(app);
+});
 
-// Export for use in other parts of your app
-export { app, analytics, db, auth, storage };
+// Export for use in your app
+export { app, auth, db, storage, analytics };

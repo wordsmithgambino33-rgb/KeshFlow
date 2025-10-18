@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { Card } from '../ui/card';
@@ -37,7 +38,6 @@ interface GoalsSavingProps {
   onBack: () => void;
 }
 
-// Map string names to Lucide icons
 const ICONS_MAP: { [key: string]: any } = {
   Target,
   GraduationCap,
@@ -55,13 +55,12 @@ export function GoalsSaving({ onBack }: GoalsSavingProps) {
     target: '',
     deadline: '',
     icon: 'Target',
-    color: 'bg-green-500',
+    color: '#10B981',
   });
   const [loading, setLoading] = useState(true);
 
   const goalsCollection = collection(db, 'goals');
 
-  // Fetch goals in real-time
   useEffect(() => {
     const q = query(goalsCollection, orderBy('createdAt', 'desc'));
     const unsubscribe = onSnapshot(q, (snapshot) => {
@@ -73,7 +72,7 @@ export function GoalsSaving({ onBack }: GoalsSavingProps) {
           target: data.target,
           saved: data.saved || 0,
           icon: data.icon || 'Target',
-          color: data.color || 'bg-green-500',
+          color: data.color || '#10B981',
           deadline: data.deadline,
           weeklyTarget: data.weeklyTarget || 0,
           category: data.category || 'General',
@@ -105,7 +104,7 @@ export function GoalsSaving({ onBack }: GoalsSavingProps) {
       target: '',
       deadline: '',
       icon: 'Target',
-      color: 'bg-green-500',
+      color: '#10B981',
     });
     setShowModal(true);
   };
@@ -157,7 +156,7 @@ export function GoalsSaving({ onBack }: GoalsSavingProps) {
         target: '',
         deadline: '',
         icon: 'Target',
-        color: 'bg-green-500',
+        color: '#10B981',
       });
     } catch (error) {
       console.error('Error saving goal:', error);
@@ -195,7 +194,7 @@ export function GoalsSaving({ onBack }: GoalsSavingProps) {
           />
         </svg>
         <div className="absolute inset-0 flex items-center justify-center">
-          <span className="text-lg font-semibold text-gray-700 dark:text-gray-300">{Math.round(percentage)}%</span>
+          <span className="text-lg font-semibold text-gray-700">{Math.round(percentage)}%</span>
         </div>
       </div>
     );
@@ -204,27 +203,27 @@ export function GoalsSaving({ onBack }: GoalsSavingProps) {
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
-        <p className="text-lg font-medium text-foreground">Loading goals...</p>
+        <p className="text-lg font-medium text-gray-700">Loading goals...</p>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-background to-secondary pb-6">
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-200 pb-6">
       {/* Header */}
-      <div className="bg-gradient-to-r from-primary to-chart-2 p-6 pt-12 rounded-b-3xl shadow-lg">
+      <div className="bg-gradient-to-r from-green-500 to-teal-500 p-6 pt-12 rounded-b-3xl shadow-lg">
         <div className="flex items-center justify-between mb-6">
           <div className="flex items-center">
-            <button onClick={onBack} className="text-primary-foreground mr-4">
+            <button onClick={onBack} className="text-white mr-4">
               <ArrowLeft size={24} />
             </button>
-            <h1 className="text-primary-foreground text-xl font-poppins">Goals & Saving</h1>
+            <h1 className="text-white text-xl font-semibold">Goals & Saving</h1>
           </div>
           <button
             onClick={openAddModal}
             className="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center"
           >
-            <Plus className="text-primary-foreground" size={20} />
+            <Plus className="text-white" size={20} />
           </button>
         </div>
 
@@ -232,17 +231,17 @@ export function GoalsSaving({ onBack }: GoalsSavingProps) {
         <Card className="bg-white/10 backdrop-blur-sm border-0 p-6 rounded-2xl">
           <div className="flex justify-between items-center mb-4">
             <div>
-              <p className="text-primary-foreground/70 text-sm">Total Saved</p>
-              <h2 className="text-primary-foreground text-2xl font-poppins">MWK {totalSavings.toLocaleString()}</h2>
+              <p className="text-white/70 text-sm">Total Saved</p>
+              <h2 className="text-white text-2xl font-semibold">MWK {totalSavings.toLocaleString()}</h2>
             </div>
             <div className="text-right">
-              <p className="text-primary-foreground/70 text-sm">Total Goals</p>
-              <h2 className="text-primary-foreground text-2xl font-poppins">MWK {totalTargets.toLocaleString()}</h2>
+              <p className="text-white/70 text-sm">Total Goals</p>
+              <h2 className="text-white text-2xl font-semibold">MWK {totalTargets.toLocaleString()}</h2>
             </div>
           </div>
           
           <div className="mb-2">
-            <div className="flex justify-between text-sm text-primary-foreground/70 mb-1">
+            <div className="flex justify-between text-sm text-white/70 mb-1">
               <span>Overall Progress</span>
               <span>{Math.round((totalSavings / totalTargets) * 100)}%</span>
             </div>
@@ -252,7 +251,7 @@ export function GoalsSaving({ onBack }: GoalsSavingProps) {
             />
           </div>
           
-          <p className="text-primary-foreground/70 text-sm">
+          <p className="text-white/70 text-sm">
             {goals.filter(goal => (goal.saved / goal.target) >= 1).length} of {goals.length} goals completed
           </p>
         </Card>
@@ -283,7 +282,7 @@ export function GoalsSaving({ onBack }: GoalsSavingProps) {
                     <div className="flex-1">
                       <div className="flex justify-between items-start mb-3">
                         <div>
-                          <h3 className="font-semibold text-lg text-foreground mb-1">{goal.name}</h3>
+                          <h3 className="font-semibold text-lg text-gray-700 mb-1">{goal.name}</h3>
                           <Badge variant="outline" className="text-xs">
                             {goal.category}
                           </Badge>
@@ -318,7 +317,7 @@ export function GoalsSaving({ onBack }: GoalsSavingProps) {
                       </div>
                       
                       <div className="mb-4">
-                        <div className="flex justify-between text-sm text-muted-foreground mb-2">
+                        <div className="flex justify-between text-sm text-gray-500 mb-2">
                           <span>MWK {goal.saved.toLocaleString()}</span>
                           <span>MWK {goal.target.toLocaleString()}</span>
                         </div>
@@ -328,22 +327,22 @@ export function GoalsSaving({ onBack }: GoalsSavingProps) {
                         />
                       </div>
 
-                      <div className="flex justify-between items-center pt-3 border-t border-border">
+                      <div className="flex justify-between items-center pt-3 border-t border-gray-300">
                         <div>
-                          <p className="text-xs text-muted-foreground mb-1">Remaining</p>
-                          <p className="text-sm font-medium text-foreground">
+                          <p className="text-xs text-gray-500 mb-1">Remaining</p>
+                          <p className="text-sm font-medium text-gray-700">
                             MWK {Math.max(0, goal.target - goal.saved).toLocaleString()}
                           </p>
                         </div>
                         <div className="text-right">
-                          <p className="text-xs text-muted-foreground mb-1">Deadline</p>
-                          <p className={`text-sm font-medium ${weeksRemaining <= 4 ? 'text-red-500' : 'text-foreground'}`}>
+                          <p className="text-xs text-gray-500 mb-1">Deadline</p>
+                          <p className={`text-sm font-medium ${weeksRemaining <= 4 ? 'text-red-500' : 'text-gray-700'}`}>
                             {weeksRemaining > 0 ? `${weeksRemaining} weeks` : 'Overdue'}
                           </p>
                         </div>
                         <div className="text-right">
-                          <p className="text-xs text-muted-foreground mb-1">Weekly Target</p>
-                          <p className="text-sm font-medium text-primary">
+                          <p className="text-xs text-gray-500 mb-1">Weekly Target</p>
+                          <p className="text-sm font-medium text-teal-600">
                             MWK {goal.weeklyTarget.toLocaleString()}
                           </p>
                         </div>
@@ -357,20 +356,20 @@ export function GoalsSaving({ onBack }: GoalsSavingProps) {
         </div>
 
         {/* Quick Actions */}
-        <Card className="p-6 rounded-2xl shadow-lg bg-gradient-to-r from-primary/10 to-chart-2/10">
-          <h3 className="font-poppins text-lg text-foreground mb-4">Quick Actions</h3>
+        <Card className="p-6 rounded-2xl shadow-lg bg-gradient-to-r from-green-100 to-teal-100">
+          <h3 className="font-semibold text-lg text-gray-700 mb-4">Quick Actions</h3>
           <div className="grid grid-cols-2 gap-4">
             <Button
               onClick={openAddModal}
               variant="outline"
-              className="h-12 border-primary text-primary hover:bg-primary hover:text-primary-foreground"
+              className="h-12 border-green-500 text-green-500 hover:bg-green-500 hover:text-white"
             >
               <Plus size={18} className="mr-2" />
               Add Goal
             </Button>
             <Button
               variant="outline"
-              className="h-12 border-chart-2 text-chart-2 hover:bg-chart-2 hover:text-white"
+              className="h-12 border-teal-500 text-teal-500 hover:bg-teal-500 hover:text-white"
             >
               <TrendingUp size={18} className="mr-2" />
               View Tips
@@ -393,16 +392,16 @@ export function GoalsSaving({ onBack }: GoalsSavingProps) {
               initial={{ scale: 0.9, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
               exit={{ scale: 0.9, opacity: 0 }}
-              className="bg-card rounded-2xl p-6 w-full max-w-md"
+              className="bg-white rounded-2xl p-6 w-full max-w-md"
               onClick={(e) => e.stopPropagation()}
             >
-              <h3 className="font-poppins text-xl text-card-foreground mb-6">
+              <h3 className="text-xl font-semibold text-gray-700 mb-6">
                 {editingGoalId ? 'Edit Goal' : 'Add New Goal'}
               </h3>
               
               <div className="space-y-4">
                 <div>
-                  <label className="block text-sm font-medium text-card-foreground mb-2">Goal Name</label>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Goal Name</label>
                   <Input
                     value={goalForm.name}
                     onChange={(e) => setGoalForm({ ...goalForm, name: e.target.value })}
@@ -412,7 +411,7 @@ export function GoalsSaving({ onBack }: GoalsSavingProps) {
                 </div>
                 
                 <div>
-                  <label className="block text-sm font-medium text-card-foreground mb-2">Target Amount (MWK)</label>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Target Amount (MWK)</label>
                   <Input
                     value={goalForm.target}
                     onChange={(e) => setGoalForm({ ...goalForm, target: e.target.value })}
@@ -423,7 +422,7 @@ export function GoalsSaving({ onBack }: GoalsSavingProps) {
                 </div>
                 
                 <div>
-                  <label className="block text-sm font-medium text-card-foreground mb-2">Target Date</label>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Target Date</label>
                   <Input
                     value={goalForm.deadline}
                     onChange={(e) => setGoalForm({ ...goalForm, deadline: e.target.value })}
@@ -433,7 +432,7 @@ export function GoalsSaving({ onBack }: GoalsSavingProps) {
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-card-foreground mb-2">Icon</label>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Icon</label>
                   <select
                     value={goalForm.icon}
                     onChange={(e) => setGoalForm({ ...goalForm, icon: e.target.value })}
@@ -446,10 +445,10 @@ export function GoalsSaving({ onBack }: GoalsSavingProps) {
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-card-foreground mb-2">Color</label>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Color</label>
                   <input
                     type="color"
-                    value={goalForm.color.replace('bg-', '#')}
+                    value={goalForm.color}
                     onChange={(e) => setGoalForm({ ...goalForm, color: e.target.value })}
                     className="w-full h-12 p-1 rounded-md border"
                   />
@@ -460,7 +459,7 @@ export function GoalsSaving({ onBack }: GoalsSavingProps) {
                 <Button onClick={() => setShowModal(false)} variant="outline" className="flex-1 h-12">
                   Cancel
                 </Button>
-                <Button onClick={handleSaveGoal} className="flex-1 h-12 bg-gradient-to-r from-primary to-chart-2">
+                <Button onClick={handleSaveGoal} className="flex-1 h-12 bg-gradient-to-r from-green-500 to-teal-500 text-white">
                   {editingGoalId ? 'Save Changes' : 'Add Goal'}
                 </Button>
               </div>
