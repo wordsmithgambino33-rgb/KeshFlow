@@ -1,0 +1,25 @@
+
+
+import React from "react";
+import { createRoot } from "react-dom/client";
+import App from "./App";
+import "./styles/global.css";
+
+// Get the root element or create one if it doesn't exist
+let rootElement = document.getElementById("root");
+if (!rootElement) {
+  rootElement = document.createElement("div");
+  rootElement.id = "root";
+  document.body.appendChild(rootElement);
+}
+
+// Create the React root and render the App
+const root = createRoot(rootElement);
+root.render(
+  <React.StrictMode>
+    <App />
+  </React.StrictMode>
+);
+
+
+export default rootElement;
