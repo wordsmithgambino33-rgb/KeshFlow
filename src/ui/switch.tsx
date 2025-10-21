@@ -1,5 +1,3 @@
-
-
 "use client";
 
 import * as React from "react";
@@ -30,9 +28,4 @@ function Switch({
   );
 }
 
-export { Switch };
-
-
 export default Switch;
-
-export { Switch };

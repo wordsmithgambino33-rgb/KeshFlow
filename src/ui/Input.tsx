@@ -1,5 +1,3 @@
-
-
 import * as React from "react";
 
 import { cn } from "../utils/utils"
@@ -20,9 +18,4 @@ function Input({ className, type, ...props }: React.ComponentProps<"input">) {
   );
 }
 
-export { Input };
-
-
 export default Input;
-
-export { Input };

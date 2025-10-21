@@ -1,5 +1,3 @@
-
-
 "use client";
 
 import * as React from "react";
@@ -67,7 +65,4 @@ function TabsContent({
 
 export { Tabs, TabsList, TabsTrigger, TabsContent };
 
-
 export default Tabs;
-
-export { Tabs };

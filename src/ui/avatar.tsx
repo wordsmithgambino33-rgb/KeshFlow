@@ -1,5 +1,3 @@
-
-
 "use client";
 
 import * as React from "react";
@@ -54,7 +52,4 @@ function AvatarFallback({
 
 export { Avatar, AvatarImage, AvatarFallback };
 
-
 export default Avatar;
-
-export { Avatar };

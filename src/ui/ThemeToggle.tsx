@@ -1,4 +1,3 @@
-
 "use client";
 
 import * as React from "react";
@@ -26,8 +25,4 @@ function ThemeToggle() {
   );
 }
 
-export { ThemeToggle };
-
 export default ThemeToggle;
-
-export { ThemeToggle };

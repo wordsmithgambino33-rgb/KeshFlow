@@ -1,5 +1,3 @@
-
-
 "use client";
 
 import * as React from "react";
@@ -37,7 +35,4 @@ function Progress({
 
 export { Progress };
 
-
 export default Progress;
-
-export { Progress };

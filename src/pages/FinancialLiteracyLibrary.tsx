@@ -1,5 +1,3 @@
-
-
 import React, { useState, useEffect } from 'react';
 import { motion } from 'motion/react';
 import { Card } from '../ui/card';
@@ -61,8 +59,6 @@ export function FinancialLiteracyLibrary({ onBack }: FinancialLiteracyLibraryPro
     if (!user) return;
     try {
       const topicRef = doc(collection(db, 'users', user.uid, 'topicViews'));
-      await setDoc(topicRef, { topicId, timestamp: serverTimestamp() });
-    } catch (error) {
       console.error('Error logging topic view:', error);
     }
   };
@@ -167,8 +163,4 @@ export function FinancialLiteracyLibrary({ onBack }: FinancialLiteracyLibraryPro
   );
 }
 
-
 export default FinancialLiteracyLibrary;
-
-
-export { Icon };

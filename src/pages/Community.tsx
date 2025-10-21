@@ -7,7 +7,7 @@ import { motion } from "motion/react";
 import { Users, MessageCircle, TrendingUp, Award, Send } from "lucide-react";
 import { Card } from "../ui/card";
 import { Button } from "../ui/button";
-import { Input } from "../ui/input";
+import { Input } from "../ui/Input";
 import { db } from "../firebase/config";
 import {
   collection,

@@ -4,7 +4,7 @@ import { motion } from 'motion/react';
 import { User, Settings, Bell, Shield, Palette, Camera } from 'lucide-react';
 import { Card } from '../ui/card';
 import { Button } from '../ui/button';
-import { Input } from '../ui/input';
+import { Input } from '../ui/Input';
 import { type Screen } from '../App';
 import { db, auth, storage } from '../firebase/config'; // Firebase initialized
 import { doc, getDoc, setDoc, updateDoc } from 'firebase/firestore';

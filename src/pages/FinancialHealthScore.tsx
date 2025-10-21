@@ -25,7 +25,7 @@ import { Card } from '../ui/card';
 import { Button } from '../ui/button';
 import { Badge } from '../ui/badge';
 import { Progress } from '../ui/progress';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '../ui/tabs';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '../ui/Tabs';
 import { Alert, AlertDescription } from '../ui/alert';
 import { type Screen } from '../App';
 import { db, auth } from '../firebase/config'; // My Firebase config

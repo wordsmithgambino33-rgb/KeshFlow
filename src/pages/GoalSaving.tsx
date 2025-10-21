@@ -4,7 +4,7 @@ import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { Card } from '../ui/card';
 import { Button } from '../ui/button';
-import { Input } from '../ui/input';
+import { Input } from '../ui/Input';
 import { Progress } from '../ui/progress';
 import { Badge } from '../ui/badge';
 import { 

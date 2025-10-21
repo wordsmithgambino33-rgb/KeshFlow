@@ -8,8 +8,8 @@ import {
 import { Card } from '../ui/card';
 import { Button } from '../ui/button';
 import { Badge } from '../ui/badge';
-import { Input } from '../ui/input';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '../ui/tabs';
+import { Input } from '../ui/Input';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '../ui/Tabs';
 import { db } from '../firebase/config'; // Firebase is initialized
 import { collection, addDoc, deleteDoc, doc, onSnapshot, serverTimestamp, query, where } from 'firebase/firestore';
 import { toast } from 'react-toastify';

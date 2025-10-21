@@ -28,8 +28,8 @@ import { Card } from '../ui/card';
 import { Button } from '../ui/button';
 import { Badge } from '../ui/badge';
 import { Progress } from '../ui/progress';
-import { Input } from '../ui/input';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '../ui/tabs';
+import { Input } from '../ui/Input';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '../ui/Tabs';
 import { type Screen } from '../App';
 
 // Firebase imports - your firebase/config.ts must export db, auth, storage

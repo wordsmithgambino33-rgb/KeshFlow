@@ -1,12 +1,10 @@
-
-
 import React, { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "motion/react";
 import { collection, addDoc, getDocs, query, orderBy, onSnapshot } from "firebase/firestore";
 import { db } from "../firebase/config";
 import { Card } from "../ui/card";
 import { Button } from "../ui/button";
-import { Input } from "../ui/input";
+import { Input } from "../ui/Input";
 import { Progress } from "../ui/progress";
 import { Badge } from "../ui/badge";
 import { FinancialLiteracyLibrary } from "../pages/FinancialLiteracyLibrary";
@@ -302,8 +300,4 @@ export function EnhancedBudgetManagement({ onBack }: BudgetManagementProps) {
   );
 }
 
-
 export default EnhancedBudgetManagement;
-
-
-export { Icon };
