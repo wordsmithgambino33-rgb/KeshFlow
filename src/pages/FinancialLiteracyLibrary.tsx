@@ -3,7 +3,7 @@ import { motion } from 'motion/react';
 import { Card } from '../ui/card';
 import { Button } from '../ui/button';
 import { Badge } from '../ui/badge';
-import { ImageWithFallback } from '../components/Figma/ImageWithFallBack';
+import { ImageWithFallback } from '../components/Figma/ImageWithFallback';
 import { ArrowLeft, ChevronRight, BookOpen, TrendingUp, PiggyBank, CreditCard, Target } from 'lucide-react';
 import { db, auth } from '../firebase/config';
 import { doc, setDoc, collection, serverTimestamp } from 'firebase/firestore';
@@ -59,6 +59,8 @@ export function FinancialLiteracyLibrary({ onBack }: FinancialLiteracyLibraryPro
     if (!user) return;
     try {
       const topicRef = doc(collection(db, 'users', user.uid, 'topicViews'));
+      // Optionally: add logging or write to Firestore here.
+    } catch (error) {
       console.error('Error logging topic view:', error);
     }
   };

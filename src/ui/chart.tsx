@@ -132,9 +132,6 @@ export {
   ChartStyle,
 };
 
-export default THEMES;
+export default Chart;
 
 
-export { THEMES };
-
-export { THEMES };

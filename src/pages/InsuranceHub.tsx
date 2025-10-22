@@ -1,5 +1,3 @@
-
-
 "use client";
 
 import React, { useState, useEffect } from 'react';
@@ -53,11 +51,10 @@ export function InsuranceHub({ onNavigate }: InsuranceHubProps) {
     }
   };
 
+  // Add: define INSURANCE_OPTIONS so the final export is valid.
   const INSURANCE_OPTIONS = [
-    { type: 'Life Insurance', icon: Heart, color: 'text-red-500', desc: "Protect your family's financial future" },
-    { type: 'Motor Insurance', icon: Car, color: 'text-blue-500', desc: 'Comprehensive vehicle coverage' },
-    { type: 'Property Insurance', icon: Home, color: 'text-green-500', desc: 'Protect your home and belongings' },
-    { type: 'Business Insurance', icon: Briefcase, color: 'text-purple-500', desc: 'Safeguard your business operations' },
+    { id: "basic", label: "Basic" },
+    { id: "premium", label: "Premium" },
   ];
 
   return (
@@ -130,8 +127,4 @@ export function InsuranceHub({ onNavigate }: InsuranceHubProps) {
   );
 }
 
-
 export default InsuranceHub;
-
-
-export { INSURANCE_OPTIONS };

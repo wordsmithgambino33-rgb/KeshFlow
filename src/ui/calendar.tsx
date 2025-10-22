@@ -97,6 +97,3 @@ function Calendar({
 
 export { Calendar }; // Updated with logic
 
-export default Calendar;
-
-export { Calendar };

@@ -1,4 +1,3 @@
-
 import React, { useEffect, useState } from 'react';
 import { motion } from 'motion/react';
 import { User, Settings, Bell, Shield, Palette, Camera } from 'lucide-react';
@@ -10,8 +9,8 @@ import { db, auth, storage } from '../firebase/config'; // Firebase initialized
 import { doc, getDoc, setDoc, updateDoc } from 'firebase/firestore';
 import { onAuthStateChanged } from 'firebase/auth';
 import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
-import { toast } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
+import { toast } from '../lib/toast';
+import '../lib/toast.css';
 
 interface ProfileSettingsProps {
   onNavigate: (screen: Screen) => void;

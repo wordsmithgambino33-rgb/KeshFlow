@@ -1,5 +1,3 @@
-
-
 import React, { useState, useEffect } from 'react';
 import { motion } from 'motion/react';
 import { 
@@ -12,8 +10,8 @@ import { Input } from '../ui/Input';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '../ui/Tabs';
 import { db } from '../firebase/config'; // Firebase is initialized
 import { collection, addDoc, deleteDoc, doc, onSnapshot, serverTimestamp, query, where } from 'firebase/firestore';
-import { toast } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
+import { toast } from '../lib/toast';
+import '../lib/toast.css';
 import { type Screen } from '../App';
 
 interface MarketplaceProps {

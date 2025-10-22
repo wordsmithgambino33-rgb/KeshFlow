@@ -1,5 +1,3 @@
-
-
 "use client";
 
 import * as React from "react";
@@ -59,10 +57,3 @@ function TooltipContent({
     </TooltipPrimitive.Portal>
   );
 }
-
-export { Tooltip, TooltipTrigger, TooltipContent, TooltipProvider };
-
-
-export default TooltipProvider;
-
-export { TooltipProvider };

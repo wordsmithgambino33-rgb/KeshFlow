@@ -167,6 +167,4 @@ export {
 export default CarouselContext;
 
 
-export { CarouselContext };
 
-export { CarouselContext };
