@@ -8,13 +8,16 @@ type Props = {
 };
 
 export function ImageWithFallback({ src, alt = "", className = "", fallbackSrc }: Props) {
-  const [imgSrc, setImgSrc] = useState<string | undefined | null>(src);
+  const [imgSrc, setImgSrc] = useState<string | null | undefined>(src ?? fallbackSrc ?? null);
+
   const handleError = () => {
-    if (fallbackSrc) setImgSrc(fallbackSrc);
-    else setImgSrc(undefined);
+    if (fallbackSrc && imgSrc !== fallbackSrc) setImgSrc(fallbackSrc);
+    else setImgSrc(null);
   };
+
   if (!imgSrc) {
     return <div className={className} aria-hidden="true" />;
   }
+
   return <img src={imgSrc} alt={alt} className={className} onError={handleError} />;
 }
