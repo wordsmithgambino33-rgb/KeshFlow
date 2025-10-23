@@ -1,5 +1,4 @@
 
-
 import React, { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import {
@@ -14,12 +13,13 @@ import {
 } from 'lucide-react';
 import { Button } from '../ui/button';
 import { Card } from '../ui/card';
-import  ThemeToggle  from '../ui/ThemeToggle';
+import ThemeToggle from '../ui/ThemeToggle';
 import { auth, db } from '../firebase/config';
 import { signInAnonymously, onAuthStateChanged } from 'firebase/auth';
 import { doc, getDoc, collection, onSnapshot, getDocs } from 'firebase/firestore';
-import toast, { Toaster } from 'react-hot-toast';
-import { Skeleton } from '../ui/skeleton'; 
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+import { Skeleton } from '../ui/skeleton';
 
 interface LandingPageProps {
   onGetStarted: () => void;
@@ -28,8 +28,8 @@ interface LandingPageProps {
 
 export function LandingPage({ onGetStarted, onSignUp }: LandingPageProps) {
   const [userData, setUserData] = useState<any>(null);
-  const [loading, setLoading] = useState(true); // Expanded loading state for data fetching
-  const [error, setError] = useState<string | null>(null); // Added for better error handling
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const [statsData, setStatsData] = useState({
     totalUsers: 0,
     totalMoneyManaged: 0,
@@ -122,18 +122,16 @@ export function LandingPage({ onGetStarted, onSignUp }: LandingPageProps) {
     return () => unsubscribeStats();
   }, []);
 
-  // --- Hero-specific derived state ---
-  // Use userData if available, otherwise fallbacks from statsData or sensible defaults
   const availableBalance = userData?.balance
-    ? Number(String(userData.balance).replace(/\D/g, '')) // try to coerce
+    ? Number(String(userData.balance).replace(/\D/g, ''))
     : statsData.totalMoneyManaged > 0
     ? statsData.totalMoneyManaged
     : 150000;
 
-  const budgetProgress = userData?.budgetProgress ?? 75; // percent
-  const savingsChange = userData?.savingsChange ?? 12; // percent
+  const budgetProgress = userData?.budgetProgress ?? 75;
+  const savingsChange = userData?.savingsChange ?? 12;
   const goalsCount = userData?.goals?.length ?? 3;
-  const trustedCount = Math.max(10000, statsData.totalUsers); // show at least 10k in UI
+  const trustedCount = Math.max(10000, statsData.totalUsers);
 
   const handleSignUpClick = () => {
     if (onSignUp) return onSignUp();
@@ -157,7 +155,20 @@ export function LandingPage({ onGetStarted, onSignUp }: LandingPageProps) {
 
   return (
     <div className="min-h-screen relative overflow-hidden bg-landing-neon text-white">
-      <Toaster position="top-right" />
+      {/* Toastify container */}
+      <ToastContainer
+        position="top-right"
+        autoClose={3000}
+        hideProgressBar={false}
+        newestOnTop={false}
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+        theme="light"
+      />
+
       <div className="absolute top-6 right-6 z-10">
         <ThemeToggle />
       </div>
@@ -280,7 +291,6 @@ export function LandingPage({ onGetStarted, onSignUp }: LandingPageProps) {
               </div>
             </div>
 
-            {/* Floating elements */}
             <motion.div
               animate={{ y: [-10, 10, -10] }}
               transition={{ duration: 4, repeat: Infinity }}
@@ -297,7 +307,7 @@ export function LandingPage({ onGetStarted, onSignUp }: LandingPageProps) {
         </div>
       </section>
 
-      {/* Stats */}
+      {/* Stats Section */}
       <section className="py-20 px-6 lg:px-12">
         {loading ? (
           <div className="max-w-7xl mx-auto grid grid-cols-2 lg:grid-cols-4 gap-8 text-center">

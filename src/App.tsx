@@ -1,7 +1,10 @@
 
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
+import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
 
-// Pages
+// Pages / Components
+import LandingPage from "./components/LandingPage";
+import SignUpAuth from "./components/SignUpAuth";
 import WebDashboard from "./pages/WebDashboard";
 import BillsSubscriptions from "./pages/BillsSubscriptions";
 import Community from "./pages/Community";
@@ -20,19 +23,19 @@ import TaxManagement from "./pages/TaxManagement";
 import TransactionLogging from "./pages/TransactionLogging";
 
 // Components
-import LandingPage from "./components/LandingPage";
 import WebSidebar from "./components/WebSidebar";
 import { BottomNavigation } from "./components/BottomNavigation";
 
 // Context
-import { BudgetProvider } from "./context/budget_context";
 import { ThemeProvider } from "./components/ThemeProvider";
+import { BudgetProvider } from "./context/budget_context";
 
-// Styles
-import "./styles/global.css";
+// Firebase Auth
+import { auth } from "./firebase/config";
 
 export type Screen =
   | "landing"
+  | "auth"
   | "dashboard"
   | "bills"
   | "community"
@@ -52,49 +55,138 @@ export type Screen =
 
 export default function App() {
   const [currentScreen, setCurrentScreen] = useState<Screen>("landing");
+  const [user, setUser] = useState(auth.currentUser);
+  const [loading, setLoading] = useState(true);
 
-  const handleNavigate = (screen: Screen) => setCurrentScreen(screen);
+  // Firebase Auth listener
+  useEffect(() => {
+    const unsubscribe = auth.onAuthStateChanged((firebaseUser) => {
+      setUser(firebaseUser);
+      setLoading(false);
+    });
+    return unsubscribe;
+  }, []);
 
-  const renderScreen = () => {
-    switch (currentScreen) {
-      case "landing": return <LandingPage onNavigate={handleNavigate} />;
-      case "dashboard": return <WebDashboard onNavigate={handleNavigate} />;
-      case "bills": return <BillsSubscriptions />;
-      case "community": return <Community />;
-      case "education": return <EducationCenter />;
-      case "enhanced-budget": return <EnhancedBudgetManagement />;
-      case "health-score": return <FinancialHealthScore />;
-      case "literacy": return <FinancialLiteracyLibrary />;
-      case "goals": return <GoalsSaving onBack={() => handleNavigate("dashboard")} />;
-      case "insurance": return <InsuranceHub onNavigate={handleNavigate} />;
-      case "marketplace": return <MarketPlace />;
-      case "portfolio": return <PortfolioPage />;
-      case "profile": return <ProfileSettings />;
-      case "reports": return <ReportsAnalytics />;
-      case "support": return <SupportCenter />;
-      case "tax": return <TaxManagement />;
-      case "transactions": return <TransactionLogging />;
-      default:
-        return <div className="p-6 text-center text-red-500">Screen not found</div>;
-    }
-  };
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center h-screen">
+        Loading...
+      </div>
+    );
+  }
 
   return (
     <ThemeProvider>
       <BudgetProvider>
-        <div className="flex min-h-screen font-sans bg-background">
-          {/* Sidebar */}
-          <WebSidebar currentScreen={currentScreen} onNavigate={handleNavigate} />
+        <Router>
+          <div className="flex min-h-screen font-sans bg-background">
+            {/* Sidebar (only when logged in) */}
+            {user && (
+              <WebSidebar
+                currentScreen={currentScreen}
+                onNavigate={(screen) => setCurrentScreen(screen)}
+              />
+            )}
 
-          {/* Main Content */}
-          <div className="flex-1 p-4 lg:p-6 overflow-auto">
-            {/* Bottom Navigation (Mobile) */}
-            <BottomNavigation currentScreen={currentScreen} onNavigate={handleNavigate} />
+            {/* Main Content */}
+            <div className="flex-1 p-4 lg:p-6 overflow-auto">
+              <Routes>
+                {/* Landing and Auth */}
+                <Route path="/" element={<LandingPage />} />
+                <Route path="/auth" element={<SignUpAuth />} />
 
-            {/* Active Page */}
-            {renderScreen()}
+                {/* Protected Dashboard */}
+                <Route
+                  path="/dashboard"
+                  element={
+                    user ? (
+                      <WebDashboard onNavigate={(screen) => setCurrentScreen(screen)} />
+                    ) : (
+                      <Navigate to="/auth" replace />
+                    )
+                  }
+                />
+
+                {/* Other Protected Pages */}
+                <Route
+                  path="/bills"
+                  element={user ? <BillsSubscriptions /> : <Navigate to="/auth" replace />}
+                />
+                <Route
+                  path="/community"
+                  element={user ? <Community /> : <Navigate to="/auth" replace />}
+                />
+                <Route
+                  path="/education"
+                  element={user ? <EducationCenter /> : <Navigate to="/auth" replace />}
+                />
+                <Route
+                  path="/enhanced-budget"
+                  element={user ? <EnhancedBudgetManagement /> : <Navigate to="/auth" replace />}
+                />
+                <Route
+                  path="/health-score"
+                  element={user ? <FinancialHealthScore /> : <Navigate to="/auth" replace />}
+                />
+                <Route
+                  path="/literacy"
+                  element={user ? <FinancialLiteracyLibrary /> : <Navigate to="/auth" replace />}
+                />
+                <Route
+                  path="/goals"
+                  element={
+                    user ? <GoalsSaving onBack={() => setCurrentScreen("dashboard")} /> : <Navigate to="/auth" replace />
+                  }
+                />
+                <Route
+                  path="/insurance"
+                  element={
+                    user ? <InsuranceHub onNavigate={(screen) => setCurrentScreen(screen)} /> : <Navigate to="/auth" replace />
+                  }
+                />
+                <Route
+                  path="/marketplace"
+                  element={user ? <MarketPlace /> : <Navigate to="/auth" replace />}
+                />
+                <Route
+                  path="/portfolio"
+                  element={user ? <PortfolioPage /> : <Navigate to="/auth" replace />}
+                />
+                <Route
+                  path="/profile"
+                  element={user ? <ProfileSettings /> : <Navigate to="/auth" replace />}
+                />
+                <Route
+                  path="/reports"
+                  element={user ? <ReportsAnalytics /> : <Navigate to="/auth" replace />}
+                />
+                <Route
+                  path="/support"
+                  element={user ? <SupportCenter /> : <Navigate to="/auth" replace />}
+                />
+                <Route
+                  path="/tax"
+                  element={user ? <TaxManagement /> : <Navigate to="/auth" replace />}
+                />
+                <Route
+                  path="/transactions"
+                  element={user ? <TransactionLogging /> : <Navigate to="/auth" replace />}
+                />
+
+                {/* Catch-all */}
+                <Route path="*" element={<Navigate to="/" replace />} />
+              </Routes>
+
+              {/* Bottom Navigation (only when logged in) */}
+              {user && (
+                <BottomNavigation
+                  currentScreen={currentScreen}
+                  onNavigate={(screen) => setCurrentScreen(screen)}
+                />
+              )}
+            </div>
           </div>
-        </div>
+        </Router>
       </BudgetProvider>
     </ThemeProvider>
   );

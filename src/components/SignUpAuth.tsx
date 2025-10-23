@@ -1,26 +1,15 @@
 
 import React, { useState } from 'react';
-import { motion } from 'motion/react';
 import { 
-  ArrowLeft,
-  Phone,
-  Mail,
-  Eye,
-  EyeOff,
-  User,
-  Lock,
-  Chrome,
-  Smartphone,
-  CheckCircle,
-  AlertCircle
-} from 'lucide-react';
-import { Button } from '../ui/button';
-import { Input } from '../ui/input';
-import { Label } from '../ui/label';
-import { Card } from '../ui/card';
-import { Badge } from '../ui/badge';
-import { createUserWithEmailAndPassword, updateProfile, GoogleAuthProvider, signInWithPopup, RecaptchaVerifier, signInWithPhoneNumber } from 'firebase/auth';
-import { auth } from '../firebase/config'; // use exported auth instance
+  createUserWithEmailAndPassword, 
+  updateProfile, 
+  GoogleAuthProvider, 
+  signInWithPopup, 
+  RecaptchaVerifier, 
+  signInWithPhoneNumber 
+} from 'firebase/auth';
+import { auth, db } from '../firebase/config';
+import { doc, setDoc, getDoc } from 'firebase/firestore';
 import Toast from 'react-native-toast-message';
 
 declare global {
@@ -51,7 +40,6 @@ export function SignUpAuth({ onBack, onSignUpComplete }: SignUpAuthProps) {
 
   const validateForm = () => {
     const newErrors: Record<string, string> = {};
-
     if (!formData.name.trim()) newErrors.name = 'Name is required';
     if (authMethod === 'phone') {
       if (!formData.phone.trim()) newErrors.phone = 'Phone number is required';
@@ -73,11 +61,44 @@ export function SignUpAuth({ onBack, onSignUpComplete }: SignUpAuthProps) {
     return Object.keys(newErrors).length === 0;
   };
 
+  // ✅ Add Firestore user doc on email signup
+  const handleEmailSignUp = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!validateForm()) return;
+    setIsLoading(true);
+    try {
+      const userCredential = await createUserWithEmailAndPassword(auth, formData.email, formData.password);
+      await updateProfile(userCredential.user, { displayName: formData.name });
+
+      // Create user doc in Firestore if it doesn't exist
+      const userRef = doc(db, 'users', userCredential.user.uid);
+      const docSnap = await getDoc(userRef);
+      if (!docSnap.exists()) {
+        await setDoc(userRef, { email: formData.email, name: formData.name, createdAt: new Date() });
+      }
+
+      Toast.show({ type: 'success', text1: 'Account created successfully' });
+      onSignUpComplete();
+    } catch (error: any) {
+      Toast.show({ type: 'error', text1: error.message });
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   const handleGoogleSignUp = async () => {
     try {
       setIsLoading(true);
       const provider = new GoogleAuthProvider();
-      await signInWithPopup(auth, provider);
+      const result = await signInWithPopup(auth, provider);
+
+      // Create Firestore user doc if it doesn't exist
+      const userRef = doc(db, 'users', result.user.uid);
+      const docSnap = await getDoc(userRef);
+      if (!docSnap.exists()) {
+        await setDoc(userRef, { email: result.user.email, name: result.user.displayName, createdAt: new Date() });
+      }
+
       Toast.show({ type: 'success', text1: 'Signed in with Google' });
       onSignUpComplete();
     } catch (error: any) {
@@ -91,12 +112,11 @@ export function SignUpAuth({ onBack, onSignUpComplete }: SignUpAuthProps) {
     e.preventDefault();
     if (!validateForm()) return;
     setIsLoading(true);
-
     try {
       if (!window.recaptchaVerifier) {
         window.recaptchaVerifier = new RecaptchaVerifier(auth, 'recaptcha-container', {
           size: 'invisible',
-          callback: () => console.log('reCAPTCHA verified'),
+          callback: () => console.log('reCAPTCHA verified')
         });
       }
       const appVerifier = window.recaptchaVerifier;
@@ -119,25 +139,20 @@ export function SignUpAuth({ onBack, onSignUpComplete }: SignUpAuthProps) {
     try {
       await confirmationResult.confirm(otp);
       Toast.show({ type: 'success', text1: 'Phone verified successfully' });
+
+      // Add phone number to Firestore user doc
+      const user = auth.currentUser;
+      if (user) {
+        const userRef = doc(db, 'users', user.uid);
+        const docSnap = await getDoc(userRef);
+        if (!docSnap.exists()) {
+          await setDoc(userRef, { phone: user.phoneNumber, createdAt: new Date() });
+        }
+      }
+
       onSignUpComplete();
     } catch (error: any) {
       Toast.show({ type: 'error', text1: 'Invalid OTP. Please try again.' });
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  const handleEmailSignUp = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!validateForm()) return;
-    setIsLoading(true);
-    try {
-      const userCredential = await createUserWithEmailAndPassword(auth, formData.email, formData.password);
-      await updateProfile(userCredential.user, { displayName: formData.name });
-      Toast.show({ type: 'success', text1: 'Account created successfully' });
-      onSignUpComplete();
-    } catch (error: any) {
-      Toast.show({ type: 'error', text1: error.message });
     } finally {
       setIsLoading(false);
     }
@@ -154,20 +169,12 @@ export function SignUpAuth({ onBack, onSignUpComplete }: SignUpAuthProps) {
     if (errors[field]) setErrors(prev => ({ ...prev, [field]: '' }));
   };
 
-  // ⬇️ Keep your full UI intact (no changes below)
-  // ...
-  // (keep your entire existing UI JSX as-is — no modifications to the layout)
-  // Just make sure to add this element near your phone form section:
-  // <div id="recaptcha-container"></div>
-
-  // Minimal placeholder return so this module compiles.
-  // Replace with your full existing JSX (ensure a <div id="recaptcha-container" /> is present near phone form).
   return (
     <div>
-      {/* SignUp UI omitted for brevity. Ensure you include: <div id="recaptcha-container"></div> */}
+      {/* Keep all your existing UI JSX */}
+      <div id="recaptcha-container"></div>
     </div>
   );
 }
-
 
 export default SignUpAuth;
