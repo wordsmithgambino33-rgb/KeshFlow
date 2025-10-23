@@ -63,4 +63,3 @@ export function ThemeProvider({ children, defaultTheme = 'light' }: ThemeProvide
 export default ThemeContext;
 
 
-export { ThemeContext };

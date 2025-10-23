@@ -4,7 +4,7 @@ import { collection, addDoc, getDocs, query, orderBy, onSnapshot } from "firebas
 import { db } from "../firebase/config";
 import { Card } from "../ui/card";
 import { Button } from "../ui/button";
-import Input from "../ui/Input";
+import   Input from "../ui/Input";
 import { Progress } from "../ui/progress";
 import { Badge } from "../ui/badge";
 import { FinancialLiteracyLibrary } from "../pages/FinancialLiteracyLibrary";

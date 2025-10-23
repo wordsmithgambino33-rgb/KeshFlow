@@ -22,12 +22,12 @@ import TransactionLogging from "./pages/TransactionLogging";
 // Components
 import LandingPage from "./components/LandingPage";
 import WebSidebar from "./components/WebSidebar";
-import ButtonNavigation from "./components/ButtonNavigation";
+import { BottomNavigation } from "./components/BottomNavigation";
 import { ThemeProvider } from "./components/ThemeProvider";
 
 // Context
 import { BudgetProvider } from "./context/budget_context";
-import { ThemeContextProvider } from "./context/ThemeContext";
+import  ThemeContext from "./context/ThemeContext";
 
 // Styles
 import "./styles/global.css";
@@ -93,7 +93,11 @@ export default function App() {
       case "transactions":
         return <TransactionLogging />;
       default:
-        return <div className="p-6 text-center text-red-500">Screen not found</div>;
+        return (
+          <div className="p-6 text-center text-red-500">
+            Screen not found
+          </div>
+        );
     }
   };
 
@@ -103,12 +107,19 @@ export default function App() {
         <ThemeProvider>
           <div className="flex min-h-screen font-sans bg-background">
             {/* Sidebar */}
-            <WebSidebar currentScreen={currentScreen} onNavigate={handleNavigate} />
+            <WebSidebar
+              currentScreen={currentScreen}
+              onNavigate={handleNavigate}
+            />
 
             {/* Main Content */}
             <div className="flex-1 p-4 lg:p-6 overflow-auto">
-              {/* Quick Buttons */}
-              <ButtonNavigation currentScreen={currentScreen} onNavigate={handleNavigate} />
+              {/* Bottom Navigation (Mobile) */}
+              <BottomNavigation
+                currentScreen={currentScreen}
+                onNavigate={handleNavigate}
+              />
+              
               {/* Active Page */}
               {renderScreen()}
             </div>

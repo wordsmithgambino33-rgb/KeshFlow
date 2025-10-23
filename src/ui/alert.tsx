@@ -69,6 +69,4 @@ export { Alert, AlertTitle, AlertDescription };
 
 
 
-export default alertVariants;
 
-export { Alert };

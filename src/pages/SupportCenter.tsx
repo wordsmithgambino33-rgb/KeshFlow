@@ -14,7 +14,7 @@ import {
 } from "lucide-react";
 import { Card } from "../ui/card";
 import { Button } from "../ui/button";
-import { Input } from "../ui/Input";
+import   Input  from "../ui/Input";
 import { collection, addDoc, onSnapshot, query, orderBy } from "firebase/firestore";
 import { db, auth } from "../firebase/config"; //  path matches  setup
 import { onAuthStateChanged } from "firebase/auth";

@@ -7,7 +7,7 @@ import { collection, addDoc, deleteDoc, doc, serverTimestamp, query, onSnapshot,
 import { Card } from '../ui/card';
 import { Button } from '../ui/button';
 import   Input  from '../ui/Input';
-import { Textarea } from '../ui/textarea';
+import Textarea from '../ui/Textarea'
 import { 
   ArrowLeft, 
   TrendingUp, 

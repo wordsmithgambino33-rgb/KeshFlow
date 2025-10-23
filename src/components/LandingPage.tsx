@@ -14,7 +14,7 @@ import {
 } from 'lucide-react';
 import { Button } from '../ui/button';
 import { Card } from '../ui/card';
-import { ThemeToggle } from '../ui/ThemeToggle';
+import  ThemeToggle  from '../ui/ThemeToggle';
 import { auth, db } from '../firebase/config';
 import { signInAnonymously, onAuthStateChanged } from 'firebase/auth';
 import { doc, getDoc, collection, onSnapshot, getDocs } from 'firebase/firestore';

@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { motion } from 'motion/react';
 import { Home, PieChart, Target, TrendingUp, CreditCard } from 'lucide-react';
@@ -80,5 +81,3 @@ export function BottomNavigation({ currentScreen, onNavigate }: BottomNavigation
     </div>
   );
 }
-
-export { BottomNavigation as ButtonNavigation };

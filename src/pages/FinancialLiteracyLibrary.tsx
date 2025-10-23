@@ -36,7 +36,7 @@ export function FinancialLiteracyLibrary({ onBack }: FinancialLiteracyLibraryPro
   const languages = [
     { code: 'en', name: 'English', flag: '🇬🇧' },
     { code: 'ny', name: 'Chichewa', flag: '🇲🇼' },
-    { code: 'to', name: 'Tonga', flag: '🇲🇼' }
+   
   ];
 
   const topics: Topic[] = [
