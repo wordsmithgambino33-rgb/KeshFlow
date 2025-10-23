@@ -196,7 +196,7 @@ export function LandingPage({ onGetStarted, onSignUp }: LandingPageProps) {
               
               <h1 id="hero-title" className="text-4xl lg:text-6xl font-poppins font-bold text-foreground leading-tight">
                 Take Control of Your
-                <span className="text-primary block">Financial Future</span>
+                <span className="text-primary block">  Financial Future</span>
               </h1>
               
               <p className="text-lg text-muted-foreground leading-relaxed max-w-lg">

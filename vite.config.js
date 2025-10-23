@@ -3,27 +3,41 @@ import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
 import path from 'path';
 
-// https://vitejs.dev/config/
 export default defineConfig({
-  plugins: [react()],
+  plugins: [
+    react({
+      jsxRuntime: 'automatic',
+    }),
+  ],
   resolve: {
     alias: {
-      '@': path.resolve(__dirname, 'src'), // cleaner imports like import X from '@/components/X'
+      '@': path.resolve(__dirname, 'src'), // clean imports
     },
   },
   server: {
     port: 5173,
-    open: true,         // auto-open in browser
-    strictPort: true,   // fail if port already in use
+    open: true,
+    strictPort: true,
     watch: {
-      usePolling: true, // helpful on Linux/WSL or network file systems
-      interval: 100,    // check for changes every 100ms
+      usePolling: true,
+      interval: 100,
     },
   },
   optimizeDeps: {
-    include: ['react', 'react-dom'], // pre-bundle essential deps
+    // ✅ Include only modular imports — NOT "firebase"
+    include: [
+      'react',
+      'react-dom',
+      'firebase/app',
+      'firebase/auth',
+      'firebase/firestore',
+      'firebase/storage',
+      'firebase/analytics',
+      'react-toastify',
+    ],
   },
   build: {
     outDir: 'dist',
+    target: 'esnext',
   },
 });
