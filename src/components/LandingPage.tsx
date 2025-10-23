@@ -1,4 +1,5 @@
 
+// src/pages/LandingPage.tsx
 import React, { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import {
@@ -37,13 +38,21 @@ export function LandingPage({ onGetStarted, onSignUp }: LandingPageProps) {
     supportAvailability: '24/7'
   });
 
+  // === DEMO LOGIN ===
   const handleDemo = async () => {
     setLoading(true);
     setError(null);
     try {
       await signInAnonymously(auth);
       toast.success('Demo session started! ✅');
-      onGetStarted();
+
+      // Wait for onAuthStateChanged to trigger before calling onGetStarted
+      const unsubscribe = onAuthStateChanged(auth, (user) => {
+        if (user) {
+          onGetStarted();
+          unsubscribe();
+        }
+      });
     } catch (err: any) {
       console.error(err);
       setError(err.message || 'Demo failed. Please try again.');
@@ -53,6 +62,7 @@ export function LandingPage({ onGetStarted, onSignUp }: LandingPageProps) {
     }
   };
 
+  // === AUTH & USER DATA ===
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (user) => {
       if (user) {
@@ -76,8 +86,10 @@ export function LandingPage({ onGetStarted, onSignUp }: LandingPageProps) {
     return () => unsubscribe();
   }, []);
 
+  // === FETCH STATS ===
   useEffect(() => {
     const fetchStats = async () => {
+      if (!auth.currentUser) return; // only fetch if user is signed in
       setLoading(true);
       setError(null);
       try {
@@ -92,7 +104,7 @@ export function LandingPage({ onGetStarted, onSignUp }: LandingPageProps) {
         usersSnap.forEach((doc) => {
           const data = doc.data();
           if (data.financialData?.balance) {
-            totalMoney += Number(data.financialData.balance?.replace(/\D/g, '')) || 0;
+            totalMoney += Number(data.financialData.balance?.toString().replace(/\D/g, '')) || 0;
           }
           if (data.financialData?.rating) {
             totalRating += data.financialData.rating;
@@ -116,12 +128,18 @@ export function LandingPage({ onGetStarted, onSignUp }: LandingPageProps) {
       }
     };
 
-    fetchStats();
+    // Initial fetch if user exists
+    if (auth.currentUser) fetchStats();
 
-    const unsubscribeStats = onSnapshot(collection(db, 'users'), () => fetchStats());
+    // Listen to users collection changes
+    const unsubscribeStats = onSnapshot(collection(db, 'users'), () => {
+      if (auth.currentUser) fetchStats();
+    });
+
     return () => unsubscribeStats();
   }, []);
 
+  // === DERIVED DATA ===
   const availableBalance = userData?.balance
     ? Number(String(userData.balance).replace(/\D/g, ''))
     : statsData.totalMoneyManaged > 0
