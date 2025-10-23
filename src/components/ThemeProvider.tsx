@@ -1,58 +1,74 @@
 
-
 import React, { createContext, useState, useEffect, useContext, ReactNode } from "react";
-import localforage from "localforage"; // <--- use this instead of AsyncStorage
-import { doc, onSnapshot, setDoc, getDoc } from "firebase/firestore";
+import localforage from "localforage";
 import { auth, db } from "../firebase/config";
+import { doc, onSnapshot, setDoc, getDoc } from "firebase/firestore";
 
+// -------------------- Types --------------------
 type ThemeMode = "light" | "dark";
 
-const themes = {
-  light: { background: "#fff", text: "#000" },
-  dark: { background: "#000", text: "#fff" },
-};
-
-interface ThemeContextProps {
-  theme: typeof themes.light | typeof themes.dark;
-  mode: ThemeMode;
-  setMode: (mode: ThemeMode) => void;
-  toggleTheme: () => void;
+interface ThemeColors {
+  background: string;
+  text: string;
 }
 
+interface ThemeContextProps {
+  theme: ThemeColors;
+  mode: ThemeMode;
+  setMode: (mode: ThemeMode) => Promise<void>;
+  toggleTheme: () => Promise<void>;
+}
+
+// -------------------- Themes --------------------
+export const themes: Record<ThemeMode, ThemeColors> = {
+  light: { background: "#ffffff", text: "#000000" },
+  dark: { background: "#000000", text: "#ffffff" },
+};
+
+// -------------------- Context --------------------
 const ThemeContext = createContext<ThemeContextProps | undefined>(undefined);
 
-export const ThemeProvider = ({ children }: { children: ReactNode }) => {
-  const [mode, setModeState] = useState<ThemeMode>("light");
+// -------------------- Provider --------------------
+interface ThemeProviderProps {
+  children: ReactNode;
+  defaultMode?: ThemeMode;
+}
 
+export const ThemeProvider = ({ children, defaultMode = "light" }: ThemeProviderProps) => {
+  const [mode, setModeState] = useState<ThemeMode>(defaultMode);
+
+  // Function to set mode and persist
   const setMode = async (newMode: ThemeMode) => {
-    try {
-      setModeState(newMode);
-      await localforage.setItem("app-theme", newMode); // <--- store in browser
-      const user = auth.currentUser;
-      if (user) {
-        const themeRef = doc(db, "users", user.uid);
-        await setDoc(themeRef, { theme: newMode }, { merge: true });
-      }
-    } catch (err) {
-      console.warn("Failed to save theme:", err);
+    setModeState(newMode);
+    localforage.setItem("app-theme", newMode).catch(console.warn);
+
+    const user = auth.currentUser;
+    if (user) {
+      const themeRef = doc(db, "users", user.uid);
+      await setDoc(themeRef, { theme: newMode }, { merge: true }).catch(console.warn);
     }
   };
 
+  // Toggle theme
+  const toggleTheme = async () => setMode(mode === "light" ? "dark" : "light");
+
+  // Load theme on mount
   useEffect(() => {
     let unsubscribe: (() => void) | undefined;
 
     const loadTheme = async () => {
       try {
         const user = auth.currentUser;
-        let saved: string | null = null;
+        let saved: ThemeMode | null = null;
 
+        // Load from Firestore if logged in
         if (user) {
           const themeRef = doc(db, "users", user.uid);
           unsubscribe = onSnapshot(
             themeRef,
             (docSnap) => {
               if (docSnap.exists()) {
-                const remoteTheme = docSnap.data().theme;
+                const remoteTheme = docSnap.data().theme as ThemeMode;
                 if (remoteTheme === "light" || remoteTheme === "dark") setModeState(remoteTheme);
               }
             },
@@ -60,11 +76,13 @@ export const ThemeProvider = ({ children }: { children: ReactNode }) => {
           );
 
           const docSnap = await getDoc(themeRef);
-          if (docSnap.exists()) saved = docSnap.data().theme;
+          if (docSnap.exists()) saved = docSnap.data().theme as ThemeMode;
         }
 
-        if (!saved) saved = await localforage.getItem<string>("app-theme"); // <--- async fetch from browser
+        // Load from localforage if Firestore empty
+        if (!saved) saved = (await localforage.getItem<ThemeMode>("app-theme")) || null;
 
+        // Default to system preference if nothing found
         if (saved === "light" || saved === "dark") setModeState(saved);
         else setModeState(window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light");
       } catch (err) {
@@ -74,8 +92,9 @@ export const ThemeProvider = ({ children }: { children: ReactNode }) => {
 
     loadTheme();
 
+    // Listen for system preference changes
     const mediaQuery = window.matchMedia("(prefers-color-scheme: dark)");
-    const handleChange = () => setModeState(mediaQuery.matches ? "dark" : "light");
+    const handleChange = (e: MediaQueryListEvent) => setModeState(e.matches ? "dark" : "light");
     mediaQuery.addEventListener("change", handleChange);
 
     return () => {
@@ -84,17 +103,23 @@ export const ThemeProvider = ({ children }: { children: ReactNode }) => {
     };
   }, []);
 
-  const toggleTheme = () => setMode(mode === "light" ? "dark" : "light");
-  const theme = mode === "light" ? themes.light : themes.dark;
+  // Apply theme class to <html>
+  useEffect(() => {
+    const root = document.documentElement;
+    if (mode === "dark") root.classList.add("dark");
+    else root.classList.remove("dark");
+  }, [mode]);
 
-  return <ThemeContext.Provider value={{ theme, mode, setMode, toggleTheme }}>{children}</ThemeContext.Provider>;
+  return (
+    <ThemeContext.Provider value={{ theme: themes[mode], mode, setMode, toggleTheme }}>
+      {children}
+    </ThemeContext.Provider>
+  );
 };
 
+// -------------------- Hook --------------------
 export const useTheme = (): ThemeContextProps => {
   const context = useContext(ThemeContext);
   if (!context) throw new Error("useTheme must be used within a ThemeProvider");
   return context;
 };
-
-
-export default themes;
