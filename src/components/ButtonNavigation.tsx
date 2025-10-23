@@ -44,7 +44,8 @@ export function BottomNavigation({ currentScreen, onNavigate }: BottomNavigation
                   className="absolute inset-0 bg-gradient-to-r from-primary to-chart-2 rounded-2xl shadow-md"
                   transition={{ type: 'spring', bounce: 0.2, duration: 0.6 }}
                 />
-              /* Icon */
+              )}
+
               <div className="relative z-10">
                 <Icon
                   size={20}
@@ -80,4 +81,4 @@ export function BottomNavigation({ currentScreen, onNavigate }: BottomNavigation
   );
 }
 
-export { ButtonNavigation };
+export { BottomNavigation as ButtonNavigation };

@@ -2,7 +2,7 @@
 
 import * as React from "react";
 
-import { Switch } from "../ui/switch"; // Adjust path based on your folder structure (e.g., "@/components/ui/switch")
+import  Switch  from "./Switch"; // Adjust path based on your folder structure (e.g., "@/components/ui/switch")
 import { Tooltip, TooltipContent, TooltipTrigger } from "../ui/tooltip"; // Optional: Wrap with Tooltip for UX
 
 function ThemeToggle() {

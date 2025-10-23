@@ -4,7 +4,7 @@ import { collection, addDoc, getDocs, query, orderBy, onSnapshot } from "firebas
 import { db } from "../firebase/config";
 import { Card } from "../ui/card";
 import { Button } from "../ui/button";
-import { Input } from "../ui/Input";
+import Input from "../ui/Input";
 import { Progress } from "../ui/progress";
 import { Badge } from "../ui/badge";
 import { FinancialLiteracyLibrary } from "../pages/FinancialLiteracyLibrary";
@@ -261,7 +261,7 @@ export function EnhancedBudgetManagement({ onBack }: BudgetManagementProps) {
                   <Input
                     placeholder="e.g., Entertainment"
                     value={newBudgetCategory}
-                    onChange={(e) => setNewBudgetCategory(e.target.value)}
+                    onChange={(e: React.ChangeEvent<HTMLInputElement>) => setNewBudgetCategory(e.target.value)}
                     className="h-12 rounded-xl border-2 border-gray-200 focus:border-[#00796B]"
                   />
                 </div>
@@ -270,7 +270,7 @@ export function EnhancedBudgetManagement({ onBack }: BudgetManagementProps) {
                   <Input
                     placeholder="e.g., 50000"
                     value={newBudgetAmount}
-                    onChange={(e) => setNewBudgetAmount(e.target.value)}
+                    onChange={(e: React.ChangeEvent<HTMLInputElement>) => setNewBudgetAmount(e.target.value)}
                     className="h-12 rounded-xl border-2 border-gray-200 focus:border-[#00796B]"
                   />
                 </div>

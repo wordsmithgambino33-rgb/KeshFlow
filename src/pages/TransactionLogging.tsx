@@ -1,11 +1,13 @@
+
+
 import React, { useState, useEffect } from 'react';
 import { motion } from 'motion/react';
 import { db } from '../firebase/config';
 import { collection, addDoc, deleteDoc, doc, serverTimestamp, query, onSnapshot, orderBy } from 'firebase/firestore';
 import { Card } from '../ui/card';
 import { Button } from '../ui/button';
-import { Input } from '../ui/Input';
-import { Textarea } from '../ui/Textarea';
+import   Input  from '../ui/Input';
+import { Textarea } from '../ui/textarea';
 import { 
   ArrowLeft, 
   TrendingUp, 
@@ -276,14 +278,12 @@ export function TransactionLogging({ onBack }: TransactionLoggingProps) {
               </h3>
               <div className="grid grid-cols-3 gap-3">
                 {['1,000', '5,000', '10,000', '20,000', '50,000', '100,000'].map((quickAmount) => (
-                  <motion.div key={quickAmount}>
+                  <motion.div key={quickAmount} whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
                     <Button
                       variant="outline"
                       size="sm"
                       onClick={() => setAmount(quickAmount.replace(',', ''))}
                       className="w-full text-xs font-medium bg-gradient-to-br from-card to-muted/50 hover:from-primary/10 hover:to-primary/20 hover:border-primary/30 transition-all duration-200"
-                      whileHover={{ scale: 1.05 }}
-                      whileTap={{ scale: 0.95 }}
                     >
                       MWK {quickAmount}
                     </Button>

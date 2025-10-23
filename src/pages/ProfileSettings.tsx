@@ -38,7 +38,7 @@ export function ProfileSettings({ onNavigate }: ProfileSettingsProps) {
       if (user && user.email) {
         setUserEmail(user.email);
       } else {
-        toast.error("No signed-in user found");
+        toast("No signed-in user found", { type: "error" });
       }
     });
     return () => unsubscribe();
@@ -75,7 +75,7 @@ export function ProfileSettings({ onNavigate }: ProfileSettingsProps) {
         }
       } catch (error) {
         console.error("Error fetching profile:", error);
-        toast.error("Failed to load profile");
+        toast("Failed to load profile", { type: "error" });
       }
     };
     fetchProfile();
@@ -88,11 +88,11 @@ export function ProfileSettings({ onNavigate }: ProfileSettingsProps) {
       const docRef = doc(db, "users", userEmail);
       // Cast to any to satisfy Firestore typing while keeping the same object shape
       await updateDoc(docRef, profile as any);
-      toast.success("Profile updated successfully!");
+      toast("Profile updated successfully!", { type: "success" });
       setEditing(false);
     } catch (error) {
       console.error(error);
-      toast.error("Failed to update profile");
+      toast("Failed to update profile", { type: "error" });
     }
   };
 
@@ -107,10 +107,10 @@ export function ProfileSettings({ onNavigate }: ProfileSettingsProps) {
       const docRef = doc(db, "users", userEmail);
       await updateDoc(docRef, { photoURL });
       setProfile({ ...profile, photoURL });
-      toast.success("Profile picture updated!");
+      toast("Profile picture updated!", { type: "success" });
     } catch (error) {
       console.error(error);
-      toast.error("Failed to upload profile picture");
+      toast("Failed to upload profile picture", { type: "error" });
     } finally {
       setUploading(false);
     }
@@ -223,7 +223,7 @@ export function ProfileSettings({ onNavigate }: ProfileSettingsProps) {
                     const docRef = doc(db, "users", userEmail);
                     updateDoc(docRef, { notifications }).catch((err) => {
                       console.error(err);
-                      toast.error("Failed to update notification setting");
+                      toast("Failed to update notification setting", { type: "error" });
                     });
                   }
                 }}
@@ -250,7 +250,7 @@ export function ProfileSettings({ onNavigate }: ProfileSettingsProps) {
                       const docRef = doc(db, "users", userEmail);
                       updateDoc(docRef, { securityLevel }).catch((err) => {
                         console.error(err);
-                        toast.error("Failed to update security level");
+                        toast("Failed to update security level", { type: "error" });
                       });
                     }
                   }}
@@ -284,9 +284,9 @@ export function ProfileSettings({ onNavigate }: ProfileSettingsProps) {
                   setProfile({ ...profile, darkMode });
                   if (userEmail) {
                     const docRef = doc(db, "users", userEmail);
-                    updateDoc(docRef, { darkMode }).catch((err) => {
+                      updateDoc(docRef, { darkMode }).catch((err) => {
                       console.error(err);
-                      toast.error("Failed to update theme setting");
+                      toast("Failed to update theme setting", { type: "error" });
                     });
                   }
                 }}

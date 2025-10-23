@@ -52,10 +52,40 @@ export function InsuranceHub({ onNavigate }: InsuranceHubProps) {
   };
 
   // Add: define INSURANCE_OPTIONS so the final export is valid.
-  const INSURANCE_OPTIONS = [
-    { id: "basic", label: "Basic" },
-    { id: "premium", label: "Premium" },
-  ];
+    const INSURANCE_OPTIONS = [
+      {
+        id: "basic",
+        type: "Basic",
+        label: "Basic Coverage",
+        icon: Shield,
+        color: "text-green-500",
+        desc: "Affordable starter coverage for essential protection.",
+      },
+      {
+        id: "premium",
+        type: "Premium",
+        label: "Premium Coverage",
+        icon: Home,
+        color: "text-teal-500",
+        desc: "Comprehensive plans with added benefits and higher limits.",
+      },
+      {
+        id: "auto",
+        type: "Auto Insurance",
+        label: "Auto",
+        icon: Car,
+        color: "text-blue-500",
+        desc: "Coverage for your vehicle including liability and collision.",
+      },
+      {
+        id: "health",
+        type: "Health Insurance",
+        label: "Health",
+        icon: Heart,
+        color: "text-red-500",
+        desc: "Medical coverage for you and your family.",
+      },
+    ];
 
   return (
     <div className="min-h-screen p-4 lg:p-8 bg-gradient-to-br from-gray-50 to-gray-200">

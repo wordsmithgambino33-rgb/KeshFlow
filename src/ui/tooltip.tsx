@@ -57,3 +57,5 @@ function TooltipContent({
     </TooltipPrimitive.Portal>
   );
 }
+
+export { TooltipProvider, Tooltip, TooltipTrigger, TooltipContent };

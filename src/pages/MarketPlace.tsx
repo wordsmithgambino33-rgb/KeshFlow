@@ -6,7 +6,7 @@ import {
 import { Card } from '../ui/card';
 import { Button } from '../ui/button';
 import { Badge } from '../ui/badge';
-import { Input } from '../ui/Input';
+import Input from '../ui/Input';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '../ui/Tabs';
 import { db } from '../firebase/config'; // Firebase is initialized
 import { collection, addDoc, deleteDoc, doc, onSnapshot, serverTimestamp, query, where } from 'firebase/firestore';
@@ -147,25 +147,25 @@ export function Marketplace({ onNavigate }: MarketplaceProps) {
   });
 
   // Fetch live user applications
-  useEffect(() => {
-    const unsubApplications = onSnapshot(
-      collection(db, "applications"),
-      (snapshot) => {
-        const apps = snapshot.docs
-          .map(doc => ({ id: doc.id, ...doc.data() }))
-          .filter(app => app.userEmail === userEmail);
-        setApplications(apps);
-      }
-    );
-
-    return () => unsubApplications();
-  }, []);
+    useEffect(() => {
+      const unsubApplications = onSnapshot(
+        collection(db, "applications"),
+        (snapshot) => {
+          const apps = snapshot.docs
+            .map(doc => ({ id: doc.id, ...(doc.data() as any) }))
+            .filter((app: any) => app.userEmail === userEmail);
+          setApplications(apps);
+        }
+      );
+  
+      return () => unsubApplications();
+    }, []);
 
   // Handle "Apply Now"
   const handleApply = async (product: any) => {
     const alreadyApplied = applications.some(app => app.productId === product.id);
     if (alreadyApplied) {
-      toast.info("You have already applied for this product.");
+      toast("You have already applied for this product.");
       return;
     }
     try {
@@ -176,10 +176,10 @@ export function Marketplace({ onNavigate }: MarketplaceProps) {
         status: "Pending",
         appliedAt: serverTimestamp()
       });
-      toast.success("Application submitted successfully!");
+      toast("Application submitted successfully!", { type: "success" });
     } catch (error) {
       console.error(error);
-      toast.error("Failed to submit application.");
+      toast("Failed to submit application.", { type: "error" });
     }
   };
 
@@ -430,13 +430,13 @@ export function Marketplace({ onNavigate }: MarketplaceProps) {
               )}
               <div className="flex justify-end gap-2">
                 <Button variant="outline" onClick={() => setViewingApplication(null)}>Close</Button>
-                {viewingApplication.status === "Pending" && (
+                  {viewingApplication.status === "Pending" && (
                   <Button
                     variant="destructive"
                     onClick={async () => {
                       await deleteDoc(doc(db, "applications", viewingApplication.id));
                       setViewingApplication(null);
-                      toast.success("Application cancelled");
+                      toast("Application cancelled", { type: "success" });
                     }}
                   >
                     Cancel Application
