@@ -10,7 +10,8 @@ import {
 } from 'firebase/auth';
 import { auth, db } from '../firebase/config';
 import { doc, setDoc, getDoc } from 'firebase/firestore';
-import Toast from 'react-native-toast-message';
+import { toast, ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 declare global {
   interface Window {
@@ -77,10 +78,10 @@ export function SignUpAuth({ onBack, onSignUpComplete }: SignUpAuthProps) {
         await setDoc(userRef, { email: formData.email, name: formData.name, createdAt: new Date() });
       }
 
-      Toast.show({ type: 'success', text1: 'Account created successfully' });
+      toast.success('Account created successfully');
       onSignUpComplete();
     } catch (error: any) {
-      Toast.show({ type: 'error', text1: error.message });
+      toast.error(error.message);
     } finally {
       setIsLoading(false);
     }
@@ -99,10 +100,10 @@ export function SignUpAuth({ onBack, onSignUpComplete }: SignUpAuthProps) {
         await setDoc(userRef, { email: result.user.email, name: result.user.displayName, createdAt: new Date() });
       }
 
-      Toast.show({ type: 'success', text1: 'Signed in with Google' });
+      toast.success('Signed in with Google');
       onSignUpComplete();
     } catch (error: any) {
-      Toast.show({ type: 'error', text1: error.message });
+      toast.error(error.message);
     } finally {
       setIsLoading(false);
     }
@@ -122,9 +123,9 @@ export function SignUpAuth({ onBack, onSignUpComplete }: SignUpAuthProps) {
       const appVerifier = window.recaptchaVerifier;
       const result = await signInWithPhoneNumber(auth, formData.phone, appVerifier);
       setConfirmationResult(result);
-      Toast.show({ type: 'info', text1: 'OTP sent to your phone' });
+      toast.info('OTP sent to your phone');
     } catch (error: any) {
-      Toast.show({ type: 'error', text1: error.message });
+      toast.error(error.message);
     } finally {
       setIsLoading(false);
     }
@@ -132,13 +133,13 @@ export function SignUpAuth({ onBack, onSignUpComplete }: SignUpAuthProps) {
 
   const handleOtpVerify = async () => {
     if (!confirmationResult || !otp.trim()) {
-      Toast.show({ type: 'error', text1: 'Please enter the OTP code' });
+      toast.error('Please enter the OTP code');
       return;
     }
     setIsLoading(true);
     try {
       await confirmationResult.confirm(otp);
-      Toast.show({ type: 'success', text1: 'Phone verified successfully' });
+      toast.success('Phone verified successfully');
 
       // Add phone number to Firestore user doc
       const user = auth.currentUser;
@@ -152,7 +153,7 @@ export function SignUpAuth({ onBack, onSignUpComplete }: SignUpAuthProps) {
 
       onSignUpComplete();
     } catch (error: any) {
-      Toast.show({ type: 'error', text1: 'Invalid OTP. Please try again.' });
+      toast.error('Invalid OTP. Please try again.');
     } finally {
       setIsLoading(false);
     }
@@ -173,6 +174,7 @@ export function SignUpAuth({ onBack, onSignUpComplete }: SignUpAuthProps) {
     <div>
       {/* Keep all your existing UI JSX */}
       <div id="recaptcha-container"></div>
+      <ToastContainer position="top-right" autoClose={3000} />
     </div>
   );
 }
