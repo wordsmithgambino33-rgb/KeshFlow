@@ -1,9 +1,8 @@
 
-// /components/BillCard.tsx
 import React from "react";
 import { Card } from "../ui/card";
 import { Badge } from "../ui/badge";
-import  Switch  from "../ui/Switch";
+import Switch from "../ui/Switch";
 import { Edit, Trash2, Pause, Play } from "lucide-react";
 
 interface BillCardProps {
@@ -37,16 +36,19 @@ export function BillCard({
   };
 
   return (
-    <Card className="flex items-center justify-between gap-4 p-4 hover:shadow-lg transition-all">
+    <Card className="flex items-center justify-between gap-4 p-4 hover:shadow-lg bg-card/90 backdrop-blur-sm border border-border rounded-2xl transition-all duration-300 hover:scale-[1.01]">
       <div className="flex items-center gap-4 flex-1 min-w-0">
+        {/* Icon Container */}
         <div
-          className={`w-12 h-12 rounded-xl ${bill.color} flex items-center justify-center text-white`}
+          className={`w-12 h-12 rounded-xl flex items-center justify-center text-white shadow-sm ${bill.color}`}
         >
           {React.cloneElement(bill.icon, { className: "w-5 h-5" })}
         </div>
+
+        {/* Bill Info */}
         <div className="flex-1 min-w-0">
-          <h3 className="font-semibold line-clamp-1">{bill.name}</h3>
-          <p className="text-sm text-gray-500 line-clamp-1">{bill.provider}</p>
+          <h3 className="font-semibold text-foreground line-clamp-1">{bill.name}</h3>
+          <p className="text-sm text-muted-foreground line-clamp-1">{bill.provider}</p>
           <div className="flex items-center gap-2 mt-1 flex-wrap">
             <Badge variant="secondary" className="text-xs">
               {bill.category}
@@ -58,27 +60,43 @@ export function BillCard({
         </div>
       </div>
 
+      {/* Amount & Status */}
       <div className="text-center flex-shrink-0 min-w-[100px]">
-        <p className="font-bold text-lg">{bill.amount}</p>
+        <p className="font-bold text-lg text-foreground">{bill.amount}</p>
         {getStatusBadge(bill.status)}
       </div>
 
-      <div className="flex items-center gap-2 flex-shrink-0">
+      {/* Controls */}
+      <div className="flex items-center gap-3 flex-shrink-0">
         <div className="flex items-center gap-2">
-          <span className="text-sm text-gray-500 hidden sm:inline">Auto-pay</span>
+          <span className="text-sm text-muted-foreground hidden sm:inline">Auto-pay</span>
           <Switch
             checked={bill.autopay}
             onCheckedChange={(val) => onToggleAutopay(bill.id, val)}
           />
         </div>
-        <div className="flex gap-1">
-          <button onClick={() => onEdit(bill.id)}>
-            <Edit className="w-4 h-4" />
+
+        <div className="flex gap-2">
+          <button
+            onClick={() => onEdit(bill.id)}
+            className="p-1 rounded-md hover:bg-accent transition-colors"
+          >
+            <Edit className="w-4 h-4 text-muted-foreground" />
           </button>
-          <button onClick={() => onTogglePause(bill.id)}>
-            {bill.status === "paid" ? <Pause className="w-4 h-4" /> : <Play className="w-4 h-4" />}
+          <button
+            onClick={() => onTogglePause(bill.id)}
+            className="p-1 rounded-md hover:bg-accent transition-colors"
+          >
+            {bill.status === "paid" ? (
+              <Pause className="w-4 h-4 text-muted-foreground" />
+            ) : (
+              <Play className="w-4 h-4 text-muted-foreground" />
+            )}
           </button>
-          <button onClick={() => onDelete(bill.id)} className="text-red-500">
+          <button
+            onClick={() => onDelete(bill.id)}
+            className="p-1 rounded-md hover:bg-destructive/10 text-destructive transition-colors"
+          >
             <Trash2 className="w-4 h-4" />
           </button>
         </div>
@@ -86,6 +104,5 @@ export function BillCard({
     </Card>
   );
 }
-
 
 export default BillCard;

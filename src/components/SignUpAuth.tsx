@@ -62,7 +62,6 @@ export function SignUpAuth({ onBack, onSignUpComplete }: SignUpAuthProps) {
     return Object.keys(newErrors).length === 0;
   };
 
-  // ✅ Add Firestore user doc on email signup
   const handleEmailSignUp = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!validateForm()) return;
@@ -71,7 +70,6 @@ export function SignUpAuth({ onBack, onSignUpComplete }: SignUpAuthProps) {
       const userCredential = await createUserWithEmailAndPassword(auth, formData.email, formData.password);
       await updateProfile(userCredential.user, { displayName: formData.name });
 
-      // Create user doc in Firestore if it doesn't exist
       const userRef = doc(db, 'users', userCredential.user.uid);
       const docSnap = await getDoc(userRef);
       if (!docSnap.exists()) {
@@ -93,7 +91,6 @@ export function SignUpAuth({ onBack, onSignUpComplete }: SignUpAuthProps) {
       const provider = new GoogleAuthProvider();
       const result = await signInWithPopup(auth, provider);
 
-      // Create Firestore user doc if it doesn't exist
       const userRef = doc(db, 'users', result.user.uid);
       const docSnap = await getDoc(userRef);
       if (!docSnap.exists()) {
@@ -141,7 +138,6 @@ export function SignUpAuth({ onBack, onSignUpComplete }: SignUpAuthProps) {
       await confirmationResult.confirm(otp);
       toast.success('Phone verified successfully');
 
-      // Add phone number to Firestore user doc
       const user = auth.currentUser;
       if (user) {
         const userRef = doc(db, 'users', user.uid);
@@ -171,10 +167,10 @@ export function SignUpAuth({ onBack, onSignUpComplete }: SignUpAuthProps) {
   };
 
   return (
-    <div>
-      {/* Keep all your existing UI JSX */}
+    <div className="min-h-screen flex flex-col justify-center items-center bg-background text-foreground">
+      {/* Your existing form UI here */}
       <div id="recaptcha-container"></div>
-      <ToastContainer position="top-right" autoClose={3000} />
+      <ToastContainer position="top-right" autoClose={3000} theme="light" />
     </div>
   );
 }

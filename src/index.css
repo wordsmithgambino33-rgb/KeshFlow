@@ -1,8 +1,7 @@
 
+/* Merge global.css here or import first */
+@import './styles/global.css';
 
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
-
-/* Import your existing global rules */
-@import './styles/global.css';

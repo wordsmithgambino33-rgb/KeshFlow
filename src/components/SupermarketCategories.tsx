@@ -6,12 +6,10 @@ import { auth, db } from "../firebase/config";
 import { doc, getDoc, setDoc, updateDoc } from "firebase/firestore";
 import { toast } from "sonner";
 
-// renamed to avoid conflict with any imported symbol
 export function SupermarketDashboard() {
   const [user, setUser] = useState<any>(null);
   const [selectedCategory, setSelectedCategory] = useState<string>("");
 
-  // 🔥 Load current user and saved category
   useEffect(() => {
     const unsubscribe = auth.onAuthStateChanged(async (currentUser) => {
       if (currentUser) {
@@ -32,7 +30,6 @@ export function SupermarketDashboard() {
     return () => unsubscribe();
   }, []);
 
-  // 🔔 Save category to Firebase when changed
   const handleCategorySelect = async (categoryId: string) => {
     setSelectedCategory(categoryId);
 
@@ -47,17 +44,14 @@ export function SupermarketDashboard() {
     }
   };
 
-  // minimal local header replacement to avoid missing-symbol errors
   const WebDashboardHeader = ({ user }: { user: any }) => (
     <header className="flex items-center gap-4">
-      <h1 className="text-2xl font-bold">
-        Welcome
-        {user?.displayName ? `, ${user.displayName}` : ""}
+      <h1 className="text-2xl font-bold text-foreground dark:text-foreground-dark">
+        Welcome{user?.displayName ? `, ${user.displayName}` : ""}
       </h1>
     </header>
   );
 
-  // simple local SupermarketCategories list to replace circular import
   const SupermarketCategoriesList = ({
     selectedCategory,
     onCategorySelect,
@@ -76,8 +70,10 @@ export function SupermarketDashboard() {
           <button
             key={c.id}
             onClick={() => onCategorySelect(c.id)}
-            className={`p-3 rounded border ${
-              selectedCategory === c.id ? "bg-primary text-white" : "bg-card"
+            className={`p-3 rounded border transition-colors duration-300 ${
+              selectedCategory === c.id
+                ? "bg-primary text-white dark:bg-primary-dark dark:text-primary-foreground-dark"
+                : "bg-card text-foreground dark:bg-card-dark dark:text-foreground-dark"
             }`}
           >
             {c.name}
@@ -88,26 +84,18 @@ export function SupermarketDashboard() {
   };
 
   return (
-    <div className="min-h-screen p-6">
+    <div className="min-h-screen p-6 bg-background text-foreground dark:bg-background-dark dark:text-foreground-dark transition-colors duration-300">
       <WebDashboardHeader user={user} />
 
       <section className="mt-8">
-        <h2 className="text-xl font-semibold mb-4">
-          Select Supermarket Category
-        </h2>
+        <h2 className="text-xl font-semibold mb-4">Select Supermarket Category</h2>
         <SupermarketCategoriesList
           selectedCategory={selectedCategory}
           onCategorySelect={handleCategorySelect}
         />
       </section>
-
-      {/* You can add other dashboard sections here, e.g., TransactionLogging, Charts, Community */}
     </div>
   );
 }
 
-
-export default SupermarketDashboard;
-
-
-export { WebDashboardHeader };
+export default SupermarketCategories;

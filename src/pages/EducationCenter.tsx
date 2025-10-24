@@ -880,4 +880,4 @@ export function EducationCenter({ onNavigate }: EducationCenterProps) {
 }
 
 
-export default modulesSyllabus;
+export default EducationCenter;

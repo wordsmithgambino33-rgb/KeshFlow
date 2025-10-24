@@ -1,15 +1,20 @@
 
+"use client";
 
-// /screens/BillsSubscriptions.tsx
 import React, { useEffect, useState } from "react";
 import { motion } from "motion/react";
 import { collection, getDocs, updateDoc, deleteDoc, doc } from "firebase/firestore";
 import { db } from "../firebase/config";
 import { BillCard } from "../components/BillCard";
 import { Card } from "../ui/card";
-import { Badge } from "../ui/badge";
 import { Button } from "../ui/button";
-import { Clock, Receipt, DollarSign, CheckCircle, AlertCircle, Bell, Plus, Calendar, CreditCard, Shield } from "lucide-react";
+import {
+  Clock,
+  Receipt,
+  DollarSign,
+  CheckCircle,
+  Plus
+} from "lucide-react";
 
 export function BillsSubscriptions() {
   const [bills, setBills] = useState<any[]>([]);
@@ -63,11 +68,11 @@ export function BillsSubscriptions() {
     .slice(0, 5);
 
   return (
-    <div className="min-h-screen p-4 lg:p-8 space-y-8">
-      {/* Header & Stats */}
+    <div className="min-h-screen bg-background text-foreground p-4 lg:p-8 space-y-8 transition-colors duration-300">
+      {/* Header */}
       <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
         <h1 className="text-3xl font-bold flex items-center gap-3">
-          <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-purple-500 rounded-xl flex items-center justify-center">
+          <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-purple-500 rounded-xl flex items-center justify-center shadow-md">
             <Receipt className="w-5 h-5 text-white" />
           </div>
           Bills & Subscriptions
@@ -77,11 +82,18 @@ export function BillsSubscriptions() {
       {/* Stats Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         {billsStats.map((stat, idx) => (
-          <Card key={idx} className="flex items-center gap-4">
-            <div className={`p-3 rounded-xl bg-gray-100 dark:bg-gray-700 ${stat.color}`}>{stat.icon}</div>
+          <Card
+            key={idx}
+            className="flex items-center gap-4 p-4 bg-card border border-border hover:shadow-md transition"
+          >
+            <div
+              className={`p-3 rounded-xl bg-muted/30 dark:bg-muted/50 ${stat.color}`}
+            >
+              {stat.icon}
+            </div>
             <div>
-              <p className="text-sm text-gray-500">{stat.title}</p>
-              <p className="font-bold">{stat.value}</p>
+              <p className="text-sm text-muted-foreground">{stat.title}</p>
+              <p className="font-bold text-foreground">{stat.value}</p>
             </div>
           </Card>
         ))}
@@ -90,10 +102,22 @@ export function BillsSubscriptions() {
       {/* View Toggle */}
       <div className="flex justify-between items-center">
         <div className="flex gap-2">
-          <Button onClick={() => setView("list")} variant={view === "list" ? "default" : "outline"}>List</Button>
-          <Button onClick={() => setView("calendar")} variant={view === "calendar" ? "default" : "outline"}>Calendar</Button>
+          <Button
+            onClick={() => setView("list")}
+            variant={view === "list" ? "default" : "outline"}
+          >
+            List
+          </Button>
+          <Button
+            onClick={() => setView("calendar")}
+            variant={view === "calendar" ? "default" : "outline"}
+          >
+            Calendar
+          </Button>
         </div>
-        <Button variant="default"><Plus className="w-4 h-4 mr-1" /> Add Bill</Button>
+        <Button variant="default">
+          <Plus className="w-4 h-4 mr-1" /> Add Bill
+        </Button>
       </div>
 
       {/* Bills List */}
@@ -110,44 +134,54 @@ export function BillsSubscriptions() {
             />
           ))}
         {view === "calendar" && (
-          <Card>
-            {/* Simple placeholder for calendar view */}
-            <p>Calendar view coming soon...</p>
+          <Card className="p-6 text-center text-muted-foreground">
+            Calendar view coming soon...
           </Card>
         )}
       </motion.div>
 
-      {/* Upcoming Bills Sidebar */}
+      {/* Upcoming Bills */}
       <div>
-        <h2 className="font-semibold text-xl mb-2">Upcoming Bills</h2>
+        <h2 className="font-semibold text-xl mb-3 text-foreground">
+          Upcoming Bills
+        </h2>
         <div className="space-y-2">
           {upcomingBills.map((bill) => (
-            <Card key={bill.id} className="flex justify-between items-center">
+            <Card
+              key={bill.id}
+              className="flex justify-between items-center p-4 bg-card border border-border"
+            >
               <div>
-                <p className="font-medium">{bill.name}</p>
-                <p className="text-xs text-gray-500">{formatDueDate(bill.dueDate)}</p>
+                <p className="font-medium text-foreground">{bill.name}</p>
+                <p className="text-xs text-muted-foreground">
+                  {formatDueDate(bill.dueDate)}
+                </p>
               </div>
-              <p className="font-bold">{bill.amount}</p>
+              <p className="font-bold text-primary">{bill.amount}</p>
             </Card>
           ))}
-          {upcomingBills.length === 0 && <p className="text-gray-500">No upcoming bills</p>}
+          {upcomingBills.length === 0 && (
+            <p className="text-muted-foreground">No upcoming bills</p>
+          )}
         </div>
       </div>
 
       {/* Tips */}
       <div>
-        <h2 className="font-semibold text-xl mb-2">Tips</h2>
-        <Card>
-          <ul className="list-disc pl-5 space-y-1 text-sm text-gray-700 dark:text-gray-300">
+        <h2 className="font-semibold text-xl mb-3 text-foreground">Tips</h2>
+        <Card className="p-5 bg-card border border-border">
+          <ul className="list-disc pl-5 space-y-1 text-sm text-muted-foreground">
             <li>Always pay bills before due date to avoid penalties.</li>
             <li>Enable auto-pay for recurring bills for convenience.</li>
-            <li>Chichewa Tip: <i>"Sungani ndalama zonse m'tsogolo"</i> – Save for the future.</li>
+            <li>
+              Chichewa Tip:{" "}
+              <i>"Sungani ndalama zonse m'tsogolo"</i> – Save for the future.
+            </li>
           </ul>
         </Card>
       </div>
     </div>
   );
 }
-
 
 export default BillsSubscriptions;

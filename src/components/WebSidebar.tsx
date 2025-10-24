@@ -39,7 +39,6 @@ export function WebSidebar({ currentScreen, onNavigate, isOpen, onClose, onLogou
   const [userName, setUserName] = useState<string>('Guest');
   const [membership, setMembership] = useState<string>('Basic Member');
 
-  // listen for auth changes and fetch user profile by UID
   useEffect(() => {
     const unsubscribeAuth = onAuthStateChanged(auth, async (user) => {
       if (!user) {
@@ -53,15 +52,13 @@ export function WebSidebar({ currentScreen, onNavigate, isOpen, onClose, onLogou
         const data = userSnap.exists() ? userSnap.data() : null;
         setUserName(data?.displayName || data?.name || user.displayName || 'User');
 
-        // Determine membership level from Firestore fields (supports multiple possible field names)
         const rawPlan =
           (data && (data.subscription?.plan || data.plan || data.subscriptionLevel || data.membership)) ||
           'basic';
         const plan = String(rawPlan).toLowerCase();
         if (plan === 'premium') setMembership('Premium Member');
         else if (plan === 'standard' || plan === 'standard_member' || plan === 'standard member') setMembership('Standard Member');
-        else setMembership('Basic Member'); // default for free/no-plan
-
+        else setMembership('Basic Member');
       } catch (err) {
         console.error('Error fetching user profile:', err);
         setUserName(user.displayName || 'User');
@@ -71,7 +68,6 @@ export function WebSidebar({ currentScreen, onNavigate, isOpen, onClose, onLogou
     return () => unsubscribeAuth();
   }, []);
 
-  // --- Firebase badge logic ---
   const fetchPendingBills = async () => {
     try {
       const q = query(collection(db, 'bills'), where('status', '==', 'pending'));
@@ -148,7 +144,7 @@ export function WebSidebar({ currentScreen, onNavigate, isOpen, onClose, onLogou
 
   return (
     <motion.div 
-      className={`fixed left-0 top-0 h-full w-64 bg-card/80 backdrop-blur-xl border-r border-border z-40 
+      className={`fixed left-0 top-0 h-full w-64 bg-card/80 dark:bg-card-dark/90 backdrop-blur-xl border-r border-border z-40 
                  transform transition-transform duration-300 ease-in-out lg:translate-x-0
                  ${isOpen ? 'translate-x-0' : '-translate-x-full'}`}
     >
@@ -160,8 +156,8 @@ export function WebSidebar({ currentScreen, onNavigate, isOpen, onClose, onLogou
               <Wallet className="w-5 h-5 text-white" />
             </div>
             <div>
-              <h2 className="font-poppins font-bold text-lg">KeshFlow</h2>
-              <p className="text-xs text-muted-foreground">Financial Freedom</p>
+              <h2 className="font-poppins font-bold text-lg text-foreground dark:text-foreground-dark">KeshFlow</h2>
+              <p className="text-xs text-muted-foreground dark:text-muted-foreground-dark">Financial Freedom</p>
             </div>
           </div>
         </div>
@@ -175,10 +171,10 @@ export function WebSidebar({ currentScreen, onNavigate, isOpen, onClose, onLogou
               </div>
             </Avatar>
             <div className="flex-1">
-              <h3 className="font-medium">{userName}</h3>
-              <p className="text-sm text-muted-foreground">{membership}</p>
+              <h3 className="font-medium text-foreground dark:text-foreground-dark">{userName}</h3>
+              <p className="text-sm text-muted-foreground dark:text-muted-foreground-dark">{membership}</p>
             </div>
-            <Bell className="w-4 h-4 text-muted-foreground" />
+            <Bell className="w-4 h-4 text-muted-foreground dark:text-muted-foreground-dark" />
           </div>
         </div>
 
@@ -188,7 +184,7 @@ export function WebSidebar({ currentScreen, onNavigate, isOpen, onClose, onLogou
             <div key={section.title} className="mb-4">
               <button
                 onClick={() => toggleSection(section.title)}
-                className="w-full flex items-center gap-2 px-2 py-2 text-xs font-medium text-muted-foreground hover:text-foreground transition-colors mb-2"
+                className="w-full flex items-center gap-2 px-2 py-2 text-xs font-medium text-muted-foreground dark:text-muted-foreground-dark hover:text-foreground dark:hover:text-foreground transition-colors mb-2"
               >
                 {expandedSections.includes(section.title) ? <ChevronDown className="w-3 h-3" /> : <ChevronRight className="w-3 h-3" />}
                 {section.title.toUpperCase()}
@@ -209,9 +205,12 @@ export function WebSidebar({ currentScreen, onNavigate, isOpen, onClose, onLogou
                       transition={{ delay: (sectionIndex * 0.1) + (index * 0.05) }}
                       onClick={() => handleNavigation(item.id)}
                       className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-left transition-all duration-200 group text-sm
-                                ${currentScreen === item.id ? 'bg-primary text-primary-foreground shadow-lg shadow-primary/25' : 'hover:bg-muted text-muted-foreground hover:text-foreground'}`}
+                                ${currentScreen === item.id 
+                                  ? 'bg-primary text-primary-foreground shadow-lg shadow-primary/25 dark:bg-primary-dark dark:text-primary-foreground-dark' 
+                                  : 'hover:bg-muted text-muted-foreground hover:text-foreground dark:hover:bg-muted-dark dark:text-muted-foreground-dark'}`
+                      }
                     >
-                      <span className={`transition-transform group-hover:scale-110 ${currentScreen === item.id ? 'text-primary-foreground' : ''}`}>
+                      <span className={`transition-transform group-hover:scale-110 ${currentScreen === item.id ? 'text-primary-foreground dark:text-primary-foreground-dark' : ''}`}>
                         {item.icon}
                       </span>
                       <span className="font-medium flex-1">{item.label}</span>
@@ -230,11 +229,11 @@ export function WebSidebar({ currentScreen, onNavigate, isOpen, onClose, onLogou
 
         {/* Footer */}
         <div className="p-4 border-t border-border space-y-2">
-          <Button variant="ghost" className="w-full justify-start gap-3 text-muted-foreground hover:text-foreground text-sm" onClick={() => handleNavigation('profile')}>
+          <Button variant="ghost" className="w-full justify-start gap-3 text-muted-foreground dark:text-muted-foreground-dark hover:text-foreground dark:hover:text-foreground text-sm" onClick={() => handleNavigation('profile')}>
             <User className="w-4 h-4" /> Profile
           </Button>
 
-          <Button variant="ghost" className="w-full justify-start gap-3 text-muted-foreground hover:text-foreground text-sm" onClick={() => handleNavigation('support')}>
+          <Button variant="ghost" className="w-full justify-start gap-3 text-muted-foreground dark:text-muted-foreground-dark hover:text-foreground dark:hover:text-foreground text-sm" onClick={() => handleNavigation('support')}>
             <HelpCircle className="w-4 h-4" /> Help & Support
           </Button>
 
@@ -246,6 +245,5 @@ export function WebSidebar({ currentScreen, onNavigate, isOpen, onClose, onLogou
     </motion.div>
   );
 }
-
 
 export default WebSidebar;
